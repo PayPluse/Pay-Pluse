@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PayPulse - NextGen Digital Wallet</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            xBlack: '#000000',
+            xDarkBg: '#080808',
+            xCardBg: '#121212',
+            xBorder: '#2f3336',
+            xLightText: '#e7e9ea',
+            xGrayText: '#71767b',
+            xBlue: '#1d9bf0',
+            xBlueHover: '#1a8cd8',
+            xGreen: '#00ba7c',
+            xRed: '#f4212e',
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #000000;
+      color: #e7e9ea;
+      font-size: 0.85rem;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* Twitter-like sleek inputs */
+    .x-input {
+      background: #000000;
+      border: 1px solid #2f3336;
+      color: #e7e9ea;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .x-input:focus {
+      border-color: #1d9bf0;
+      box-shadow: 0 0 0 1px #1d9bf0;
+      outline: none;
+    }
+
+    /* Twitter Action Button */
+    .x-btn-primary {
+      background-color: #e7e9ea;
+      color: #0f1419;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .x-btn-primary:active {
+      opacity: 0.85;
+      transform: scale(0.98);
+    }
+
+    .x-btn-accent {
+      background-color: #1d9bf0;
+      color: #ffffff;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .x-btn-accent:active {
+      background-color: #1a8cd8;
+      transform: scale(0.98);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #000000;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2f3336;
+      border-radius: 4px;
+    }
+
+    @keyframes scanLine {
+      0% { top: 0%; }
+      100% { top: 100%; }
+    }
+    .scanner-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #1d9bf0;
+      box-shadow: 0 0 10px #1d9bf0;
+      animation: scanLine 2s infinite ease-in-out alternate;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-xBlue selection:text-white">
+
+  <!-- TOP NAVBAR (Clean Twitter/X Header) -->
+  <header class="sticky top-0 z-40 px-4 py-3 flex items-center justify-between bg-black/90 backdrop-blur-md border-b border-xBorder">
+    <div class="flex items-center space-x-2">
+      <!-- X-style Logo Icon -->
+      <div class="w-8 h-8 rounded-full bg-xLightText text-black flex items-center justify-center font-black text-base">
+        𝕏
+      </div>
+      <span class="text-base font-bold tracking-tight text-xLightText">
+        PayPulse <span class="text-[10px] text-xBlue font-medium px-1.5 py-0.5 rounded-full bg-xBlue/10 border border-xBlue/30 uppercase tracking-wider">PRO</span>
+      </span>
+    </div>
+
+    <div id="navUserStatus" class="hidden items-center space-x-3 text-xs">
+      <div class="flex items-center space-x-2 bg-xDarkBg px-3 py-1 rounded-full border border-xBorder">
+        <span class="w-2 h-2 rounded-full bg-xGreen animate-pulse"></span>
+        <span id="navUserName" class="font-medium text-xLightText">User</span>
+      </div>
+      <button onclick="logout()" class="text-xGrayText hover:text-xRed transition-colors p-1" title="Sign Out">
+        <i class="fa-solid fa-power-off text-xs"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow flex items-center justify-center p-3 sm:p-6 relative">
+
+    <!-- ONBOARDING CARD CONTAINER -->
+    <div id="authContainer" class="w-full max-w-md bg-xDarkBg rounded-2xl p-5 sm:p-7 border border-xBorder relative overflow-hidden transition-all duration-300">
+
+      <!-- STEP 1: MOBILE & OTP -->
+      <section id="step1" class="space-y-4">
+        <div class="text-center space-y-1">
+          <h2 class="text-lg font-bold text-xLightText tracking-wide">Enter Mobile Number</h2>
+          <p class="text-xs text-xGrayText">Select your country and verify via instant SMS OTP</p>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <!-- Country Select -->
+          <div>
+            <label class="block text-[11px] font-medium text-xGrayText mb-1 uppercase tracking-wider">Country / Region</label>
+            <div class="relative">
+              <select id="countrySelect" onchange="updateCountryCode()" class="x-input w-full py-2.5 px-3 text-xs rounded-xl appearance-none cursor-pointer pr-8">
+                <option value="IN" data-code="+91">🇮🇳 India (+91)</option>
+                <option value="RU" data-code="+7">🇷🇺 Russia (+7)</option>
+                <option value="CN" data-code="+86">🇨🇳 China (+86)</option>
+                <option value="US" data-code="+1">🇺🇸 United States (+1)</option>
+                <option value="GB" data-code="+44">🇬🇧 United Kingdom (+44)</option>
+                <option value="AE" data-code="+971">🇦🇪 United Arab Emirates (+971)</option>
+                <option value="CA" data-code="+1">🇨🇦 Canada (+1)</option>
+                <option value="AU" data-code="+61">🇦🇺 Australia (+61)</option>
+                <option value="DE" data-code="+49">🇩🇪 Germany (+49)</option>
+                <option value="FR" data-code="+33">🇫🇷 France (+33)</option>
+                <option value="JP" data-code="+81">🇯🇵 Japan (+81)</option>
+                <option value="SA" data-code="+966">🇸🇦 Saudi Arabia (+966)</option>
+                <option value="BR" data-code="+55">🇧🇷 Brazil (+55)</option>
+              </select>
+              <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-xs text-xGrayText pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- Mobile Input -->
+          <div>
+            <label class="block text-[11px] font-medium text-xGrayText mb-1 uppercase tracking-wider">Mobile Number</label>
+            <div class="flex space-x-2">
+              <span id="countryCodePrefix" class="x-input px-3 py-2.5 text-xs rounded-xl flex items-center justify-center font-mono text-xBlue font-semibold min-w-[55px]">
+                +91
+              </span>
+              <input type="tel" id="phoneNumberInput" placeholder="ENTER YOUR NUMBER" maxlength="10" class="x-input w-full py-2.5 px-3 text-xs rounded-xl font-mono tracking-wider" />
+            </div>
+          </div>
+
+          <button id="btnSendOtp" onclick="startOtpProcess()" class="x-btn-accent w-full py-3 rounded-full font-bold text-xs mt-2 flex items-center justify-center space-x-2">
+            <span>Send OTP Code</span>
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+          </button>
+        </div>
+
+        <!-- OTP Box -->
+        <div id="otpBox" class="hidden space-y-3 pt-4 border-t border-xBorder">
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] font-medium text-xGrayText uppercase tracking-wider">Verification OTP</label>
+            <span id="timerText" class="text-xs font-mono text-xBlue font-semibold bg-xDarkBg px-2 py-0.5 rounded border border-xBorder">
+              00:20
+            </span>
+          </div>
+
+          <div class="relative">
+            <input type="text" id="otpInput" maxlength="6" placeholder="Waiting for auto OTP..." readonly class="x-input w-full py-2.5 px-3 text-center text-sm font-mono tracking-widest text-xBlue font-bold rounded-xl cursor-not-allowed" />
+            <div id="otpSpinner" class="hidden absolute right-3 top-2.5">
+              <i class="fa-solid fa-circle-notch fa-spin text-xBlue text-sm"></i>
+            </div>
+          </div>
+
+          <p id="otpHint" class="text-[11px] text-xGrayText text-center italic">
+            Generating secure token... (Auto fills in <span id="timerCountdown">20</span>s)
+          </p>
+
+          <button id="btnVerifyOtp" disabled onclick="verifyAndProceedStep1()" class="w-full py-3 rounded-full font-bold text-xs bg-xBorder opacity-50 cursor-not-allowed transition-all text-xGrayText">
+            Verify & Continue
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2: PROFILE DETAILS -->
+      <section id="step2" class="hidden space-y-4">
+        <div class="text-center space-y-1">
+          <h2 class="text-lg font-bold text-xLightText tracking-wide">Personal Profile</h2>
+          <p class="text-xs text-xGrayText">Set up your PayPulse account identity</p>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <div>
+            <label class="block text-[11px] font-medium text-xGrayText mb-1 uppercase tracking-wider">Full Name</label>
+            <input type="text" id="userNameInput" placeholder="ENTER YOUR NAME" class="x-input w-full py-2.5 px-3 text-xs rounded-xl uppercase" />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-xGrayText mb-1 uppercase tracking-wider">Citizenship Country</label>
+            <select id="userCountryDetail" class="x-input w-full py-2.5 px-3 text-xs rounded-xl appearance-none cursor-pointer">
+              <option value="India">India</option>
+              <option value="Russia">Russia</option>
+              <option value="China">China</option>
+              <option value="United States">United States</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="United Arab Emirates">United Arab Emirates</option>
+              <option value="Canada">Canada</option>
+              <option value="Australia">Australia</option>
+              <option value="Germany">Germany</option>
+              <option value="France">France</option>
+              <option value="Japan">Japan</option>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+              <option value="Brazil">Brazil</option>
+            </select>
+          </div>
+
+          <button onclick="submitStep2()" class="x-btn-accent w-full py-3 rounded-full font-bold text-xs mt-3">
+            Save & Continue to Pay ID Setup
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 3: IDENTITY VERIFICATION (FORMATTED PAY ID) -->
+      <section id="step3" class="hidden space-y-4">
+        <div class="text-center space-y-1">
+          <h2 class="text-lg font-bold text-xLightText tracking-wide">Unique Pay ID Generation</h2>
+          <p class="text-xs text-xGrayText">Your unique P2P transfer ID in XXXX-XXX-XXXX format</p>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-medium text-xGrayText uppercase tracking-wider">Pay ID (XXXX-XXX-XXXX)</label>
+              <button onclick="generateRandomFormattedPayId()" class="text-[10px] text-xBlue hover:underline">Regenerate</button>
+            </div>
+            <input type="text" id="identityNumInput" placeholder="1234-123-1234" readonly class="x-input w-full py-2.5 px-3 text-sm rounded-xl font-mono tracking-widest text-xBlue font-bold text-center" />
+            <p class="text-[10px] text-xGrayText mt-1.5 text-center">Share this Pay ID with friends to send & request money instantly.</p>
+          </div>
+
+          <button onclick="submitStep3()" class="x-btn-accent w-full py-3 rounded-full font-bold text-xs mt-3">
+            Proceed to Document Upload
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 4: DOCUMENT PHOTO UPLOAD -->
+      <section id="step4" class="hidden space-y-4">
+        <div class="text-center space-y-1">
+          <h2 class="text-lg font-bold text-xLightText tracking-wide">Identity Verification Photo</h2>
+          <p class="text-xs text-xGrayText">Upload photo of your National ID / Passport / Card</p>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <div id="dropZone" class="border border-dashed border-xBorder rounded-2xl p-5 text-center bg-black relative cursor-pointer hover:border-xBlue transition-all">
+            <input type="file" id="idPhotoInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)" />
+            
+            <div id="uploadPrompt" class="space-y-2">
+              <i class="fa-solid fa-cloud-arrow-up text-3xl text-xBlue"></i>
+              <p class="text-xs font-medium text-xLightText">Click or Drag & Drop photo here</p>
+              <p class="text-[10px] text-xGrayText">Supports JPG, PNG (Auto Security Scan)</p>
+            </div>
+
+            <!-- Preview & Scanner -->
+            <div id="uploadPreview" class="hidden space-y-2 relative overflow-hidden rounded-xl">
+              <img id="previewImage" src="" alt="ID Preview" class="w-full h-36 object-cover rounded-xl opacity-80" />
+              <div class="scanner-line"></div>
+              <p id="scanningStatusText" class="text-[11px] text-xBlue font-mono animate-pulse font-semibold mt-1">
+                Scanning security hologram...
+              </p>
+            </div>
+          </div>
+
+          <button id="btnSubmitKYC" disabled onclick="submitStep4()" class="w-full py-3 rounded-full font-bold text-xs bg-xBorder opacity-50 cursor-not-allowed transition-all text-xGrayText">
+            Submit & Verify Profile
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboardContainer" class="hidden w-full max-w-4xl space-y-4">
+      
+      <!-- WALLET BANNER CARD (Clean X Black Style) -->
+      <div class="bg-xDarkBg rounded-2xl p-5 sm:p-7 border border-xBorder relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs text-xGrayText font-medium uppercase tracking-wider">PayPulse Balance</span>
+              <span class="bg-xGreen/10 text-xGreen border border-xGreen/30 text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 font-medium">
+                <i class="fa-solid fa-shield-halved text-[9px]"></i> Verified Account
+              </span>
+            </div>
+            
+            <h1 id="walletBalanceDisplay" class="text-3xl sm:text-4xl font-black text-xLightText tracking-tight mt-1 font-mono">
+              $0.00
+            </h1>
+            <p id="userInfoSubtitle" class="text-xs text-xGrayText mt-2">
+              Account: <span id="dashUserName" class="text-xLightText font-medium">--</span> | 
+              Phone: <span id="dashPhone" class="text-xLightText font-mono">--</span>
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button onclick="handleDepositClick()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-black border border-xBorder hover:border-xBlue transition-all group">
+              <div class="w-9 h-9 rounded-full bg-xBlue/10 text-xBlue flex items-center justify-center mb-1 group-hover:bg-xBlue group-hover:text-white transition-all">
+                <i class="fa-solid fa-arrow-down text-sm"></i>
+              </div>
+              <span class="text-[11px] font-bold text-xLightText">Deposit</span>
+            </button>
+
+            <button onclick="handleWithdrawClick()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-black border border-xBorder hover:border-xBlue transition-all group">
+              <div class="w-9 h-9 rounded-full bg-xBlue/10 text-xBlue flex items-center justify-center mb-1 group-hover:bg-xBlue group-hover:text-white transition-all">
+                <i class="fa-solid fa-arrow-up text-sm"></i>
+              </div>
+              <span class="text-[11px] font-bold text-xLightText">Withdraw</span>
+            </button>
+
+            <button onclick="handleSendClick()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-black border border-xBorder hover:border-xBlue transition-all group">
+              <div class="w-9 h-9 rounded-full bg-xBlue/10 text-xBlue flex items-center justify-center mb-1 group-hover:bg-xBlue group-hover:text-white transition-all">
+                <i class="fa-solid fa-paper-plane text-sm"></i>
+              </div>
+              <span class="text-[11px] font-bold text-xLightText">Send P2P</span>
+            </button>
+
+            <button onclick="handleRequestClick()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-black border border-xBorder hover:border-xBlue transition-all group relative">
+              <div id="pendingReqBadge" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-xRed rounded-full text-[9px] font-bold text-white flex items-center justify-center animate-bounce">0</div>
+              <div class="w-9 h-9 rounded-full bg-xBlue/10 text-xBlue flex items-center justify-center mb-1 group-hover:bg-xBlue group-hover:text-white transition-all">
+                <i class="fa-solid fa-hand-holding-dollar text-sm"></i>
+              </div>
+              <span class="text-[11px] font-bold text-xLightText">Request</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INCOMING REQUESTS NOTIFICATION CARD (IF ANY PENDING) -->
+      <div id="incomingRequestsCard" class="hidden bg-xDarkBg rounded-2xl p-4 border border-xRed/40 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold text-xRed flex items-center gap-2">
+            <i class="fa-solid fa-bell animate-pulse"></i> Pending Payment Requests
+          </h3>
+          <span class="text-[10px] text-xRed font-mono">Action Required</span>
+        </div>
+        <div id="incomingRequestsList" class="space-y-2">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT GRID -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        
+        <!-- TRANSACTIONS & HISTORIES WITH TABS -->
+        <div class="lg:col-span-2 bg-xDarkBg rounded-2xl p-4 border border-xBorder space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-xBorder pb-3 gap-2">
+            <h3 class="text-xs font-bold text-xLightText uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-xBlue"></i> History Log
+            </h3>
+            
+            <!-- History Filter Tabs -->
+            <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-xBorder text-[10px]">
+              <button onclick="setHistoryFilter('all')" id="tabAll" class="px-2.5 py-1 rounded-lg bg-xBlue text-white font-bold">All</button>
+              <button onclick="setHistoryFilter('deposit')" id="tabDeposit" class="px-2.5 py-1 rounded-lg text-xGrayText hover:text-xLightText">Deposits</button>
+              <button onclick="setHistoryFilter('withdraw')" id="tabWithdraw" class="px-2.5 py-1 rounded-lg text-xGrayText hover:text-xLightText">Withdraws</button>
+              <button onclick="setHistoryFilter('send')" id="tabSend" class="px-2.5 py-1 rounded-lg text-xGrayText hover:text-xLightText">Sends</button>
+              <button onclick="setHistoryFilter('request')" id="tabRequest" class="px-2.5 py-1 rounded-lg text-xGrayText hover:text-xLightText">Requests</button>
+            </div>
+          </div>
+
+          <div id="transactionsList" class="space-y-2 max-h-80 overflow-y-auto pr-1">
+            <div class="text-center py-8 text-xGrayText text-xs">
+              Loading activity history...
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILE & LINKED BANK DETAILS CARD -->
+        <div class="bg-xDarkBg rounded-2xl p-4 border border-xBorder space-y-3 h-fit">
+          <h3 class="text-xs font-bold text-xLightText uppercase tracking-wider border-b border-xBorder pb-3 flex items-center gap-2">
+            <i class="fa-solid fa-id-card text-xBlue"></i> Identity & Bank Info
+          </h3>
+
+          <div class="space-y-2.5 text-xs">
+            <div class="flex justify-between py-1 border-b border-xBorder">
+              <span class="text-xGrayText">Verification</span>
+              <span class="text-xGreen font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-circle-check"></i> Complete
+              </span>
+            </div>
+
+            <div class="flex justify-between py-1 border-b border-xBorder">
+              <span class="text-xGrayText">Your Pay ID</span>
+              <span id="dashPayId" class="font-mono text-xBlue font-bold select-all tracking-wider">---- --- ----</span>
+            </div>
+
+            <div class="flex justify-between py-1 border-b border-xBorder">
+              <span class="text-xGrayText">Country</span>
+              <span id="dashCountry" class="text-xLightText">--</span>
+            </div>
+
+            <div class="py-1 border-b border-xBorder">
+              <div class="flex justify-between">
+                <span class="text-xGrayText">Linked Bank</span>
+                <span id="dashBankStatus" class="text-amber-500 font-medium">Not Linked</span>
+              </div>
+              <p id="dashBankDetailText" class="text-[10px] text-xGrayText mt-1">Click Withdraw to link bank account.</p>
+            </div>
+          </div>
+
+          <div class="bg-black rounded-xl p-3 border border-xBorder text-[11px] text-xGrayText flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-xBlue"></i> Live Realtime P2P System Connected
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- EXTREME DEPOSIT MODAL -->
+  <div id="extremeDepositModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-xDarkBg max-w-lg w-full rounded-2xl p-5 border border-xBorder space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-xBorder pb-3">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-shield-halved text-xBlue"></i>
+          <h3 class="text-sm font-bold text-xLightText">Extreme Secure Deposit Verification</h3>
+        </div>
+        <button onclick="closeExtremeDepositModal()" class="text-xGrayText hover:text-xLightText">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-xGrayText">Complete multi-factor KYC verification for high-tier instant deposits.</p>
+
+      <div class="space-y-3 text-xs">
+        <!-- 1. Country Selection -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">1. Deposit Origin Country</label>
+          <select id="depCountry" class="x-input w-full py-2.5 px-3 rounded-xl">
+            <option value="India">🇮🇳 India</option>
+            <option value="United States">🇺🇸 United States</option>
+            <option value="United Kingdom">🇬🇧 United Kingdom</option>
+            <option value="United Arab Emirates">🇦🇪 United Arab Emirates</option>
+            <option value="Russia">🇷🇺 Russia</option>
+            <option value="China">🇨🇳 China</option>
+            <option value="Canada">🇨🇦 Canada</option>
+          </select>
+        </div>
+
+        <!-- 2. Phone Number -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">2. Registered Mobile Number</label>
+          <input type="tel" id="depPhone" placeholder="Enter phone number" class="x-input w-full py-2.5 px-3 rounded-xl font-mono" />
+        </div>
+
+        <!-- 3. PAN Card / National ID -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">3. PAN Card / Tax Identification Number</label>
+          <input type="text" id="depPanCard" placeholder="ABCDE1234F" class="x-input w-full py-2.5 px-3 rounded-xl font-mono uppercase" />
+        </div>
+
+        <!-- 4. Deposit Method Selection -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">4. Payment Method</label>
+          <select id="depMethod" onchange="toggleDepMethodFields()" class="x-input w-full py-2.5 px-3 rounded-xl">
+            <option value="USDT_TRC20">USDT (TRC20 Network)</option>
+            <option value="USDT_ERC20">USDT (ERC20 Network)</option>
+            <option value="BITCOIN">Bitcoin (BTC)</option>
+            <option value="BANK_TRANSFER">Direct Bank Wire / UPI</option>
+          </select>
+        </div>
+
+        <!-- Crypto Dynamic Info Box -->
+        <div id="cryptoDepositDetails" class="bg-black p-3.5 rounded-xl border border-xBorder space-y-2">
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-xGrayText">Deposit Wallet Address:</span>
+            <button onclick="copyWalletAddress()" class="text-xBlue hover:underline text-[10px]">Copy Address</button>
+          </div>
+          <input type="text" id="depWalletAddress" readonly value="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" class="x-input w-full py-2 px-3 text-[11px] rounded-lg font-mono text-xBlue select-all" />
+          <p class="text-[10px] text-xGrayText">⚠️ Send exact amount to the address above. Credits auto-confirm after 1 blockchain confirmation.</p>
+        </div>
+
+        <!-- 5. Deposit Amount -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">5. Deposit Amount ($)</label>
+          <input type="number" id="depAmount" placeholder="100.00" step="0.01" class="x-input w-full py-2.5 px-3 rounded-xl font-mono text-xBlue font-bold" />
+        </div>
+
+        <!-- 6. Transaction Hash / Reference ID -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">6. Transaction Hash / Ref ID</label>
+          <input type="text" id="depTxHash" placeholder="Enter TX Hash or Bank Ref No." class="x-input w-full py-2.5 px-3 rounded-xl font-mono" />
+        </div>
+      </div>
+
+      <button onclick="submitExtremeDeposit()" class="x-btn-accent w-full py-3 rounded-full font-bold text-xs mt-2">
+        Submit Extreme Deposit
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 5: SUCCESS MODAL -->
+  <div id="successModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-xDarkBg max-w-sm w-full rounded-2xl p-6 text-center space-y-4 border border-xGreen/40">
+      <div class="w-16 h-16 rounded-full bg-xGreen/10 border-2 border-xGreen flex items-center justify-center mx-auto text-xGreen text-2xl animate-bounce">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      
+      <div class="space-y-1">
+        <h3 class="text-lg font-bold text-xLightText">Verification Completed!</h3>
+        <p class="text-xs text-xGrayText">Your Identity & Pay ID have been generated.</p>
+      </div>
+
+      <button onclick="closeSuccessModalAndOpenDash()" class="x-btn-accent w-full py-3 rounded-full text-xs font-bold">
+        Open My Wallet Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- LINK BANK ACCOUNT MODAL -->
+  <div id="linkBankModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-xDarkBg max-w-md w-full rounded-2xl p-5 space-y-4 border border-xBorder max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-xBorder pb-3">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-chevron-left text-xs text-xGrayText cursor-pointer" onclick="closeLinkBankModal()"></i>
+          <h3 class="text-sm font-bold text-xLightText">Add a bank account</h3>
+        </div>
+        <button onclick="closeLinkBankModal()" class="text-xGrayText hover:text-xLightText">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Choose a Bank -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-building-columns text-xBlue"></i> Choose a bank
+          </label>
+          <select id="bankSelectInput" class="x-input w-full py-2.5 px-3 text-xs rounded-xl font-medium cursor-pointer">
+            <option value="">Please select a bank</option>
+            <option value="State Bank of India (SBI)">State Bank of India (SBI)</option>
+            <option value="HDFC Bank">HDFC Bank</option>
+            <option value="ICICI Bank">ICICI Bank</option>
+            <option value="Sberbank (Russia)">Sberbank (Russia)</option>
+            <option value="Bank of China">Bank of China</option>
+            <option value="Bank of America">Bank of America</option>
+            <option value="Chase Bank">Chase Bank</option>
+            <option value="HSBC Bank">HSBC Bank</option>
+          </select>
+        </div>
+
+        <!-- Full Recipient's Name -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-user text-xBlue"></i> Full recipient's name
+          </label>
+          <input type="text" id="bankRecipientName" placeholder="ENTER YOUR NAME" class="x-input w-full py-2.5 px-3 text-xs rounded-xl uppercase font-medium" />
+        </div>
+
+        <!-- Bank Account Number -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-credit-card text-xBlue"></i> Bank account number
+          </label>
+          <input type="text" id="bankAccountNumber" placeholder="Please enter your bank account number" class="x-input w-full py-2.5 px-3 text-xs rounded-xl font-mono" />
+        </div>
+
+        <!-- Phone Number -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-mobile-screen text-xBlue"></i> Phone number
+          </label>
+          <input type="tel" id="bankPhoneNumber" placeholder="ENTER YOUR NUMBER" class="x-input w-full py-2.5 px-3 text-xs rounded-xl font-mono" />
+        </div>
+
+        <!-- Mail -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-envelope text-xBlue"></i> Mail
+          </label>
+          <input type="email" id="bankEmailInput" placeholder="please input your email" class="x-input w-full py-2.5 px-3 text-xs rounded-xl" />
+        </div>
+
+        <!-- IFSC / SWIFT Code -->
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-key text-xBlue"></i> IFSC / SWIFT code
+          </label>
+          <input type="text" id="bankIfscCode" placeholder="Please enter IFSC/SWIFT code" class="x-input w-full py-2.5 px-3 text-xs rounded-xl font-mono uppercase" />
+        </div>
+      </div>
+
+      <button onclick="saveBankDetailsAndWithdraw()" class="x-btn-primary w-full py-3 rounded-full text-xs font-bold tracking-wide transition-all mt-2">
+        Save & Open Withdraw
+      </button>
+    </div>
+  </div>
+
+  <!-- GENERIC ACTION TRANSACTION MODAL -->
+  <div id="actionModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-xDarkBg max-w-sm w-full rounded-2xl p-5 space-y-4 border border-xBorder">
+      <div class="flex items-center justify-between border-b border-xBorder pb-2">
+        <h3 id="modalTitle" class="text-sm font-bold text-xLightText capitalize">Transaction</h3>
+        <button onclick="closeActionModal()" class="text-xGrayText hover:text-xLightText">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3" id="modalFieldsContainer">
+        <!-- Dynamic Fields populated by JS -->
+      </div>
+
+      <div class="flex space-x-2 pt-2">
+        <button onclick="closeActionModal()" class="w-1/2 py-2.5 rounded-full text-xs font-bold bg-black border border-xBorder text-xGrayText">Cancel</button>
+        <button onclick="executeActionTransaction()" class="x-btn-accent w-1/2 py-2.5 rounded-full text-xs font-bold">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="py-3 text-center text-[10px] text-xGrayText border-t border-xBorder">
+    PayPulse Encrypted P2P Wallet • Firebase Realtime Sync
+  </footer>
+
+  <!-- FIREBASE SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+  <!-- APP LOGIC -->
+  <script>
+    // FIREBASE INITIALIZATION
+    const firebaseConfig = {
+      apiKey: "AIzaSyBVBaRpSf054ZQodDOkKIqMdbleIdqiTWI",
+      authDomain: "luck-royal-e32d2.firebaseapp.com",
+      databaseURL: "https://luck-royal-e32d2-default-rtdb.firebaseio.com",
+      projectId: "luck-royal-e32d2",
+      storageBucket: "luck-royal-e32d2.firebasestorage.app",
+      messagingSenderId: "718518779080",
+      appId: "1:718518779080:web:cfd16740cc4a050570f9fd"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // STATE STRUCTURE
+    let currentUserData = {
+      phone: '',
+      name: '',
+      country: 'India',
+      payId: '',               // Formatted: XXXX-XXX-XXXX
+      panPhoto: 'APPROVED',
+      isVerified: true,
+      createdAt: new Date().toISOString(),
+      currentBalance: 0.00,    // Starts at $0.00
+      bankDetails: null,
+      transactions: [],
+      deposits: [],
+      withdrawals: [],
+      sends: [],
+      requests: []
+    };
+
+    let generatedOtpCode = '';
+    let countdownTimer = null;
+    let currentActionType = ''; // 'deposit', 'withdraw', 'send', 'request'
+    let activeFilter = 'all';
+
+    // -------------------------------------------------------------
+    // INITIALIZATION & AUTO SESSION RESTORE
+    // -------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedPhone = localStorage.getItem('activeUserPhone') || localStorage.getItem('paypulse_logged_phone');
+      if (savedPhone) {
+        currentUserData.phone = savedPhone;
+        localStorage.setItem('activeUserPhone', savedPhone);
+        loadUserDataFromFirebaseAndOpenDash(savedPhone);
+      }
+    });
+
+    function getCleanPhoneKey(phone) {
+      const p = phone || currentUserData.phone;
+      return p ? p.replace(/[^0-9]/g, '') : '';
+    }
+
+    // GENERATE FORMATTED PAY ID: XXXX-XXX-XXXX (e.g. 1234-123-1234)
+    function generateRandomFormattedPayId() {
+      const part1 = Math.floor(1000 + Math.random() * 9000).toString();
+      const part2 = Math.floor(100 + Math.random() * 900).toString();
+      const part3 = Math.floor(1000 + Math.random() * 9000).toString();
+      const formatted = `${part1}-${part2}-${part3}`;
+      document.getElementById('identityNumInput').value = formatted;
+      return formatted;
+    }
+
+    function loadUserDataFromFirebaseAndOpenDash(phone) {
+      const phoneKey = getCleanPhoneKey(phone);
+      if (!phoneKey) return;
+
+      db.ref('users/' + phoneKey).on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          currentUserData = {
+            ...currentUserData,
+            ...val,
+            phone: val.phone || currentUserData.phone,
+            name: val.name || currentUserData.name,
+            payId: val.payId || val.identityNumber || '',
+            currentBalance: val.currentBalance !== undefined ? parseFloat(val.currentBalance) : 0.00,
+            bankDetails: val.bankDetails || null,
+            transactions: val.transactions ? (Array.isArray(val.transactions) ? val.transactions : Object.values(val.transactions)) : [],
+            deposits: val.deposits ? (Array.isArray(val.deposits) ? val.deposits : Object.values(val.deposits)) : [],
+            withdrawals: val.withdrawals ? (Array.isArray(val.withdrawals) ? val.withdrawals : Object.values(val.withdrawals)) : [],
+            sends: val.sends ? (Array.isArray(val.sends) ? val.sends : Object.values(val.sends)) : [],
+            requests: val.requests ? (Array.isArray(val.requests) ? val.requests : Object.values(val.requests)) : []
+          };
+
+          // Update Pay ID index mapping for P2P lookup
+          if (currentUserData.payId) {
+            db.ref('payIdMap/' + currentUserData.payId.replace(/[^0-9]/g, '')).set(phoneKey);
+          }
+
+          document.getElementById('authContainer').classList.add('hidden');
+          document.getElementById('dashboardContainer').classList.remove('hidden');
+
+          document.getElementById('navUserStatus').classList.remove('hidden');
+          document.getElementById('navUserStatus').classList.add('flex');
+          document.getElementById('navUserName').innerText = currentUserData.name || 'User';
+
+          renderDashboard();
+          checkPendingRequestsNotification();
+        } else {
+          localStorage.removeItem('activeUserPhone');
+          localStorage.removeItem('paypulse_logged_phone');
+        }
+      });
+    }
+
+    function updateCountryCode() {
+      const select = document.getElementById('countrySelect');
+      const selectedOption = select.options[select.selectedIndex];
+      const code = selectedOption.getAttribute('data-code');
+      document.getElementById('countryCodePrefix').innerText = code;
+    }
+
+    // -------------------------------------------------------------
+    // STEP 1: OTP LOGIC
+    // -------------------------------------------------------------
+    function startOtpProcess() {
+      const phoneVal = document.getElementById('phoneNumberInput').value.trim();
+      const prefix = document.getElementById('countryCodePrefix').innerText;
+
+      if (!phoneVal || phoneVal.length < 7) {
+        alert('Please enter your mobile number.');
+        return;
+      }
+
+      currentUserData.phone = prefix + phoneVal;
+
+      document.getElementById('btnSendOtp').classList.add('hidden');
+      document.getElementById('otpBox').classList.remove('hidden');
+      document.getElementById('otpSpinner').classList.remove('hidden');
+
+      let secondsLeft = 20;
+      document.getElementById('timerCountdown').innerText = secondsLeft;
+      document.getElementById('timerText').innerText = `00:${secondsLeft < 10 ? '0' : ''}${secondsLeft}`;
+
+      countdownTimer = setInterval(() => {
+        secondsLeft--;
+        document.getElementById('timerCountdown').innerText = secondsLeft;
+        document.getElementById('timerText').innerText = `00:${secondsLeft < 10 ? '0' : ''}${secondsLeft}`;
+
+        if (secondsLeft <= 0) {
+          clearInterval(countdownTimer);
+          autoFillOtp();
+        }
+      }, 1000);
+    }
+
+    function autoFillOtp() {
+      generatedOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      document.getElementById('otpInput').value = generatedOtpCode;
+      document.getElementById('otpSpinner').classList.add('hidden');
+      document.getElementById('otpHint').innerHTML = `<span class="text-xGreen font-semibold">✔ OTP Auto-Filled: ${generatedOtpCode}</span>`;
+
+      const btnVerify = document.getElementById('btnVerifyOtp');
+      btnVerify.disabled = false;
+      btnVerify.classList.remove('bg-xBorder', 'opacity-50', 'cursor-not-allowed', 'text-xGrayText');
+      btnVerify.classList.add('x-btn-accent');
+
+      setTimeout(() => {
+        verifyAndProceedStep1();
+      }, 1000);
+    }
+
+    function verifyAndProceedStep1() {
+      if (countdownTimer) clearInterval(countdownTimer);
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.remove('hidden');
+    }
+
+    // -------------------------------------------------------------
+    // STEP 2 & 3 & 4
+    // -------------------------------------------------------------
+    function submitStep2() {
+      const name = document.getElementById('userNameInput').value.trim();
+      const country = document.getElementById('userCountryDetail').value;
+
+      if (!name) {
+        alert('Please enter your full name.');
+        return;
+      }
+
+      currentUserData.name = name.toUpperCase();
+      currentUserData.country = country;
+
+      generateRandomFormattedPayId();
+
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('step3').classList.remove('hidden');
+    }
+
+    function submitStep3() {
+      const payId = document.getElementById('identityNumInput').value.trim();
+      currentUserData.payId = payId;
+
+      document.getElementById('step3').classList.add('hidden');
+      document.getElementById('step4').classList.remove('hidden');
+    }
+
+    document.getElementById('dropZone').addEventListener('click', () => {
+      document.getElementById('idPhotoInput').click();
+    });
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById('uploadPrompt').classList.add('hidden');
+        document.getElementById('uploadPreview').classList.remove('hidden');
+        document.getElementById('previewImage').src = e.target.result;
+
+        setTimeout(() => {
+          document.getElementById('scanningStatusText').innerHTML = `<span class="text-xGreen">✔ ID Hologram & Security Verified</span>`;
+          const btn = document.getElementById('btnSubmitKYC');
+          btn.disabled = false;
+          btn.classList.remove('bg-xBorder', 'opacity-50', 'cursor-not-allowed', 'text-xGrayText');
+          btn.classList.add('x-btn-accent');
+        }, 1500);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function submitStep4() {
+      localStorage.setItem('activeUserPhone', currentUserData.phone);
+      localStorage.setItem('paypulse_logged_phone', currentUserData.phone);
+      
+      document.getElementById('successModal').classList.remove('hidden');
+      saveUserDataToFirebase();
+    }
+
+    function closeSuccessModalAndOpenDash() {
+      document.getElementById('successModal').classList.add('hidden');
+      loadUserDataFromFirebaseAndOpenDash(currentUserData.phone);
+    }
+
+    // -------------------------------------------------------------
+    // FIREBASE SYNC (REALTIME DB WRITE)
+    // -------------------------------------------------------------
+    function saveUserDataToFirebase() {
+      const phoneKey = getCleanPhoneKey();
+      if (!phoneKey) return;
+
+      const payload = {
+        phone: currentUserData.phone,
+        name: currentUserData.name,
+        country: currentUserData.country,
+        payId: currentUserData.payId || '',
+        panPhoto: currentUserData.panPhoto || 'APPROVED',
+        isVerified: true,
+        createdAt: currentUserData.createdAt || new Date().toISOString(),
+        currentBalance: parseFloat(currentUserData.currentBalance || 0.00),
+        bankDetails: currentUserData.bankDetails || null,
+        transactions: currentUserData.transactions || [],
+        deposits: currentUserData.deposits || [],
+        withdrawals: currentUserData.withdrawals || [],
+        sends: currentUserData.sends || [],
+        requests: currentUserData.requests || [],
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      };
+
+      db.ref('users/' + phoneKey).set(payload);
+
+      if (currentUserData.payId) {
+        const cleanPayId = currentUserData.payId.replace(/[^0-9]/g, '');
+        db.ref('payIdMap/' + cleanPayId).set(phoneKey);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // DASHBOARD & HISTORY FILTER RENDER
+    // -------------------------------------------------------------
+    function setHistoryFilter(type) {
+      activeFilter = type;
+
+      ['all', 'deposit', 'withdraw', 'send', 'request'].forEach(t => {
+        const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (btn) {
+          if (t === type) {
+            btn.className = 'px-2.5 py-1 rounded-lg bg-xBlue text-white font-bold';
+          } else {
+            btn.className = 'px-2.5 py-1 rounded-lg text-xGrayText hover:text-xLightText';
+          }
+        }
+      });
+
+      renderDashboard();
+    }
+
+    function renderDashboard() {
+      document.getElementById('walletBalanceDisplay').innerText = `$${parseFloat(currentUserData.currentBalance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      
+      document.getElementById('dashUserName').innerText = currentUserData.name || 'User';
+      document.getElementById('dashPhone').innerText = currentUserData.phone || '--';
+      document.getElementById('dashCountry').innerText = currentUserData.country || '--';
+      document.getElementById('dashPayId').innerText = currentUserData.payId || '---- --- ----';
+
+      // Bank Status Display
+      const bankStatusEl = document.getElementById('dashBankStatus');
+      const bankDetailEl = document.getElementById('dashBankDetailText');
+      if (currentUserData.bankDetails) {
+        bankStatusEl.innerText = 'Linked';
+        bankStatusEl.className = 'text-xGreen font-semibold';
+        bankDetailEl.innerText = `${currentUserData.bankDetails.bankName} (Acc: ****${currentUserData.bankDetails.accountNumber.slice(-4)})`;
+      } else {
+        bankStatusEl.innerText = 'Not Linked';
+        bankStatusEl.className = 'text-amber-500 font-medium';
+        bankDetailEl.innerText = 'Click Withdraw to link bank account.';
+      }
+
+      // Filtered History Render
+      const txContainer = document.getElementById('transactionsList');
+      txContainer.innerHTML = '';
+
+      let list = currentUserData.transactions || [];
+      if (activeFilter !== 'all') {
+        list = list.filter(t => (t.type || '').toLowerCase() === activeFilter.toLowerCase());
+      }
+
+      if (!list || list.length === 0) {
+        txContainer.innerHTML = `<div class="text-center py-8 text-xGrayText text-xs">No ${activeFilter === 'all' ? '' : activeFilter} records found.</div>`;
+        return;
+      }
+
+      const sortedTx = [...list].reverse();
+      sortedTx.forEach(tx => {
+        const txType = (tx.type || '').toLowerCase();
+        const isPositive = txType.includes('deposit') || txType.includes('received');
+        const colorClass = isPositive ? 'text-xGreen' : (txType.includes('request') && tx.status === 'Pending' ? 'text-amber-500' : 'text-xRed');
+        const sign = isPositive ? '+' : (txType.includes('request') && tx.status === 'Pending' ? '' : '-');
+        
+        let iconClass = 'fa-arrow-right-arrow-left text-xBlue';
+        if (txType.includes('deposit')) iconClass = 'fa-arrow-down text-xGreen';
+        else if (txType.includes('withdraw')) iconClass = 'fa-arrow-up text-xRed';
+        else if (txType.includes('send') || txType.includes('sent')) iconClass = 'fa-paper-plane text-xRed';
+        else if (txType.includes('received')) iconClass = 'fa-hand-holding-dollar text-xGreen';
+        else if (txType.includes('request')) iconClass = 'fa-clock text-amber-500';
+
+        const itemHtml = `
+          <div class="flex items-center justify-between p-3 rounded-xl bg-black border border-xBorder hover:border-xBlue transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-full bg-xDarkBg border border-xBorder flex items-center justify-center text-xs">
+                <i class="fa-solid ${iconClass}"></i>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-xLightText">${(tx.type || '').toUpperCase()}</p>
+                <p class="text-[10px] text-xGrayText font-mono">${tx.targetName ? tx.targetName : 'System'} • ${tx.date || 'Just Now'}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-xs font-mono font-extrabold ${colorClass}">${sign}$${parseFloat(tx.amount).toFixed(2)}</p>
+              <span class="text-[9px] px-2 py-0.5 rounded-full bg-xDarkBg text-xGrayText border border-xBorder">${tx.status || 'Completed'}</span>
+            </div>
+          </div>
+        `;
+        txContainer.innerHTML += itemHtml;
+      });
+    }
+
+    // -------------------------------------------------------------
+    // EXTREME DEPOSIT LOGIC
+    // -------------------------------------------------------------
+    function handleDepositClick() {
+      document.getElementById('depPhone').value = currentUserData.phone || '';
+      document.getElementById('depCountry').value = currentUserData.country || 'India';
+      toggleDepMethodFields();
+      document.getElementById('extremeDepositModal').classList.remove('hidden');
+    }
+
+    function closeExtremeDepositModal() {
+      document.getElementById('extremeDepositModal').classList.add('hidden');
+    }
+
+    function toggleDepMethodFields() {
+      const method = document.getElementById('depMethod').value;
+      const walletInput = document.getElementById('depWalletAddress');
+
+      if (method === 'USDT_TRC20') {
+        walletInput.value = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
+      } else if (method === 'USDT_ERC20') {
+        walletInput.value = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
+      } else if (method === 'BITCOIN') {
+        walletInput.value = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
+      } else {
+        walletInput.value = 'BANK WIRE / UPI ID: paypulse@bank';
+      }
+    }
+
+    function copyWalletAddress() {
+      const val = document.getElementById('depWalletAddress').value;
+      navigator.clipboard.writeText(val);
+      alert('Address copied to clipboard!');
+    }
+
+    function submitExtremeDeposit() {
+      const country = document.getElementById('depCountry').value;
+      const phone = document.getElementById('depPhone').value.trim();
+      const pan = document.getElementById('depPanCard').value.trim();
+      const method = document.getElementById('depMethod').value;
+      const amount = parseFloat(document.getElementById('depAmount').value);
+      const hash = document.getElementById('depTxHash').value.trim();
+
+      if (!phone || !pan || isNaN(amount) || amount <= 0 || !hash) {
+        alert('Please fill out all Extreme Deposit verification fields!');
+        return;
+      }
+
+      const timestamp = new Date().toLocaleString();
+      const txId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
+
+      // Instant Crediting & Record saving
+      currentUserData.currentBalance = parseFloat(currentUserData.currentBalance || 0) + amount;
+
+      const record = {
+        id: txId,
+        type: 'deposit',
+        amount: amount,
+        method: method,
+        pan: pan,
+        txHash: hash,
+        payId: currentUserData.payId,
+        targetName: 'Extreme Deposit (' + method + ')',
+        date: timestamp,
+        status: 'Completed'
+      };
+
+      currentUserData.deposits.push(record);
+      currentUserData.transactions.push(record);
+
+      saveUserDataToFirebase();
+      closeExtremeDepositModal();
+      alert(`Extreme Deposit of $${amount.toFixed(2)} verified & credited successfully!`);
+    }
+
+    // -------------------------------------------------------------
+    // LIVE REQUEST NOTIFICATIONS & P2P APPROVAL FLOW
+    // -------------------------------------------------------------
+    function checkPendingRequestsNotification() {
+      const incomingCard = document.getElementById('incomingRequestsCard');
+      const incomingList = document.getElementById('incomingRequestsList');
+      const badge = document.getElementById('pendingReqBadge');
+
+      const pendingList = (currentUserData.requests || []).filter(r => r.isIncoming && r.status === 'Pending');
+
+      if (pendingList.length > 0) {
+        badge.innerText = pendingList.length;
+        badge.classList.remove('hidden');
+        incomingCard.classList.remove('hidden');
+        incomingList.innerHTML = '';
+
+        pendingList.forEach(req => {
+          incomingList.innerHTML += `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl bg-black border border-xRed/30 gap-2">
+              <div>
+                <p class="text-xs text-xLightText font-bold">${req.requesterName || 'A User'} requests <span class="font-mono text-xBlue font-bold">$${parseFloat(req.amount).toFixed(2)}</span></p>
+                <p class="text-[10px] text-xGrayText font-mono">Pay ID: ${req.requesterPayId} • ${req.date}</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button onclick="respondToPaymentRequest('${req.id}', 'decline')" class="px-3 py-1.5 bg-black text-xRed hover:bg-xRed/10 rounded-full text-xs font-bold border border-xRed/40">Decline</button>
+                <button onclick="respondToPaymentRequest('${req.id}', 'accept')" class="x-btn-accent px-3 py-1.5 text-white rounded-full text-xs font-bold">Accept & Pay</button>
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        badge.classList.add('hidden');
+        incomingCard.classList.add('hidden');
+      }
+    }
+
+    function respondToPaymentRequest(reqId, action) {
+      const reqIndex = currentUserData.requests.findIndex(r => r.id === reqId);
+      if (reqIndex === -1) return;
+
+      const req = currentUserData.requests[reqIndex];
+      const amount = parseFloat(req.amount);
+
+      if (action === 'accept') {
+        if (currentUserData.currentBalance < amount) {
+          alert('Insufficient balance to accept this payment request!');
+          return;
+        }
+
+        // Deduct from current user
+        currentUserData.currentBalance -= amount;
+        currentUserData.requests[reqIndex].status = 'Accepted';
+
+        const txRecord = { id: 'TXN-' + Math.floor(100000 + Math.random() * 900000), type: 'send', amount: amount, targetName: req.requesterName, payId: req.requesterPayId, date: new Date().toLocaleString(), status: 'Completed' };
+        currentUserData.sends.push(txRecord);
+        currentUserData.transactions.push(txRecord);
+
+        // Credit to Requester via Firebase P2P
+        if (req.requesterPhoneKey) {
+          db.ref('users/' + req.requesterPhoneKey).once('value', (snap) => {
+            const reqUserData = snap.val();
+            if (reqUserData) {
+              const reqUserBalance = parseFloat(reqUserData.currentBalance || 0) + amount;
+              const reqTx = { id: txRecord.id, type: 'received', amount: amount, targetName: currentUserData.name, payId: currentUserData.payId, date: new Date().toLocaleString(), status: 'Completed' };
+              
+              const updatedTx = reqUserData.transactions ? (Array.isArray(reqUserData.transactions) ? reqUserData.transactions : Object.values(reqUserData.transactions)) : [];
+              updatedTx.push(reqTx);
+
+              db.ref('users/' + req.requesterPhoneKey).update({
+                currentBalance: reqUserBalance,
+                transactions: updatedTx
+              });
+            }
+          });
+        }
+        alert(`Payment of $${amount.toFixed(2)} sent to ${req.requesterName}!`);
+      } else {
+        currentUserData.requests[reqIndex].status = 'Declined';
+        alert('Payment request declined.');
+      }
+
+      saveUserDataToFirebase();
+    }
+
+    // -------------------------------------------------------------
+    // WITHDRAW FLOW
+    // -------------------------------------------------------------
+    function handleWithdrawClick() {
+      document.getElementById('bankRecipientName').value = currentUserData.name || '';
+      document.getElementById('bankPhoneNumber').value = currentUserData.phone || '';
+      document.getElementById('linkBankModal').classList.remove('hidden');
+    }
+
+    function closeLinkBankModal() {
+      document.getElementById('linkBankModal').classList.add('hidden');
+    }
+
+    function saveBankDetailsAndWithdraw() {
+      const bank = document.getElementById('bankSelectInput').value;
+      const name = document.getElementById('bankRecipientName').value.trim();
+      const accNum = document.getElementById('bankAccountNumber').value.trim();
+      const phone = document.getElementById('bankPhoneNumber').value.trim();
+      const email = document.getElementById('bankEmailInput').value.trim();
+      const ifsc = document.getElementById('bankIfscCode').value.trim();
+
+      if (!bank || !name || !accNum || !phone || !email || !ifsc) {
+        alert('Please fill out all bank account fields.');
+        return;
+      }
+
+      currentUserData.bankDetails = {
+        bankName: bank,
+        recipientName: name,
+        accountNumber: accNum,
+        phone: phone,
+        email: email,
+        ifsc: ifsc
+      };
+
+      saveUserDataToFirebase();
+      closeLinkBankModal();
+
+      openActionModal('withdraw');
+    }
+
+    // -------------------------------------------------------------
+    // ACTION MODALS (WITHDRAW / SEND / REQUEST)
+    // -------------------------------------------------------------
+    function handleSendClick() { openActionModal('send'); }
+    function handleRequestClick() { openActionModal('request'); }
+
+    function openActionModal(action) {
+      currentActionType = action;
+      const modal = document.getElementById('actionModal');
+      const title = document.getElementById('modalTitle');
+      const container = document.getElementById('modalFieldsContainer');
+
+      title.innerText = `${action.toUpperCase()} FUNDS`;
+      container.innerHTML = '';
+
+      if (action === 'withdraw') {
+        container.innerHTML = `
+          <div class="bg-black p-2.5 rounded-xl border border-xBorder text-[11px] text-xBlue mb-2">
+            Transferring to: <span class="font-bold">${currentUserData.bankDetails ? currentUserData.bankDetails.bankName : 'Linked Bank'}</span>
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-xGrayText mb-1">Withdraw Amount ($)</label>
+            <input type="number" id="actionAmountInput" placeholder="50.00" step="0.01" class="x-input w-full py-2 px-3 text-xs rounded-xl font-mono" />
+          </div>
+        `;
+      } else if (action === 'send') {
+        container.innerHTML = `
+          <div>
+            <label class="block text-[11px] font-medium text-xGrayText mb-1">Recipient Pay ID (XXXX-XXX-XXXX)</label>
+            <input type="text" id="actionPayIdInput" placeholder="1234-123-1234" class="x-input w-full py-2 px-3 text-xs rounded-xl font-mono tracking-wider" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-xGrayText mb-1">Amount to Send ($)</label>
+            <input type="number" id="actionAmountInput" placeholder="25.00" step="0.01" class="x-input w-full py-2 px-3 text-xs rounded-xl font-mono" />
+          </div>
+        `;
+      } else if (action === 'request') {
+        container.innerHTML = `
+          <div>
+            <label class="block text-[11px] font-medium text-xGrayText mb-1">Target Pay ID (XXXX-XXX-XXXX)</label>
+            <input type="text" id="actionPayIdInput" placeholder="1234-123-1234" class="x-input w-full py-2 px-3 text-xs rounded-xl font-mono tracking-wider" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-xGrayText mb-1">Requested Amount ($)</label>
+            <input type="number" id="actionAmountInput" placeholder="50.00" step="0.01" class="x-input w-full py-2 px-3 text-xs rounded-xl font-mono" />
+          </div>
+        `;
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeActionModal() {
+      document.getElementById('actionModal').classList.add('hidden');
+    }
+
+    // -------------------------------------------------------------
+    // EXECUTE REALTIME P2P TRANSACTIONS
+    // -------------------------------------------------------------
+    function executeActionTransaction() {
+      const amtEl = document.getElementById('actionAmountInput');
+      const amount = parseFloat(amtEl ? amtEl.value : 0);
+
+      if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid positive amount.');
+        return;
+      }
+
+      let newBalance = parseFloat(currentUserData.currentBalance || 0);
+      const timestamp = new Date().toLocaleString();
+      const txId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
+
+      if (currentActionType === 'withdraw') {
+        if (amount > newBalance) {
+          alert('Insufficient balance for withdrawal!');
+          return;
+        }
+        newBalance -= amount;
+
+        const record = { id: txId, type: 'withdraw', amount: amount, payId: currentUserData.payId, targetName: currentUserData.bankDetails ? currentUserData.bankDetails.bankName : 'Bank', date: timestamp, status: 'Completed' };
+        currentUserData.withdrawals.push(record);
+        currentUserData.transactions.push(record);
+        currentUserData.currentBalance = newBalance;
+        saveUserDataToFirebase();
+        closeActionModal();
+
+      } else if (currentActionType === 'send') {
+        const rawTargetPayId = document.getElementById('actionPayIdInput').value.trim();
+        const cleanTargetPayId = rawTargetPayId.replace(/[^0-9]/g, '');
+
+        if (!cleanTargetPayId || cleanTargetPayId.length !== 11) {
+          alert('Please enter a valid 11-digit Pay ID (Format: XXXX-XXX-XXXX).');
+          return;
+        }
+
+        if (rawTargetPayId === currentUserData.payId) {
+          alert('You cannot send money to your own Pay ID!');
+          return;
+        }
+
+        if (amount > newBalance) {
+          alert('Insufficient wallet balance!');
+          return;
+        }
+
+        // Search Target User via Firebase Mapping
+        db.ref('payIdMap/' + cleanTargetPayId).once('value', (snapshot) => {
+          const targetPhoneKey = snapshot.val();
+          if (!targetPhoneKey) {
+            alert('Target Pay ID not found on PayPulse system!');
+            return;
+          }
+
+          // Fetch Target User & Transfer Funds Live
+          db.ref('users/' + targetPhoneKey).once('value', (userSnap) => {
+            const recipientUser = userSnap.val();
+            if (!recipientUser) {
+              alert('Recipient user profile error.');
+              return;
+            }
+
+            // Deduct Sender
+            currentUserData.currentBalance -= amount;
+            const senderRecord = { id: txId, type: 'send', amount: amount, payId: rawTargetPayId, targetName: recipientUser.name || 'User', date: timestamp, status: 'Completed' };
+            currentUserData.sends.push(senderRecord);
+            currentUserData.transactions.push(senderRecord);
+
+            // Credit Recipient
+            const recipientBalance = parseFloat(recipientUser.currentBalance || 0) + amount;
+            const recipientTxList = recipientUser.transactions ? (Array.isArray(recipientUser.transactions) ? recipientUser.transactions : Object.values(recipientUser.transactions)) : [];
+            const recipientRecord = { id: txId, type: 'received', amount: amount, payId: currentUserData.payId, targetName: currentUserData.name, date: timestamp, status: 'Completed' };
+            recipientTxList.push(recipientRecord);
+
+            db.ref('users/' + targetPhoneKey).update({
+              currentBalance: recipientBalance,
+              transactions: recipientTxList
+            });
+
+            saveUserDataToFirebase();
+            closeActionModal();
+            alert(`Successfully transferred $${amount.toFixed(2)} to ${recipientUser.name}!`);
+          });
+        });
+
+      } else if (currentActionType === 'request') {
+        const rawTargetPayId = document.getElementById('actionPayIdInput').value.trim();
+        const cleanTargetPayId = rawTargetPayId.replace(/[^0-9]/g, '');
+
+        if (!cleanTargetPayId || cleanTargetPayId.length !== 11) {
+          alert('Please enter a valid 11-digit Pay ID (Format: XXXX-XXX-XXXX).');
+          return;
+        }
+
+        if (rawTargetPayId === currentUserData.payId) {
+          alert('You cannot request money from yourself!');
+          return;
+        }
+
+        db.ref('payIdMap/' + cleanTargetPayId).once('value', (snapshot) => {
+          const targetPhoneKey = snapshot.val();
+          if (!targetPhoneKey) {
+            alert('Target Pay ID not found on PayPulse network!');
+            return;
+          }
+
+          db.ref('users/' + targetPhoneKey).once('value', (userSnap) => {
+            const recipientUser = userSnap.val();
+            if (!recipientUser) {
+              alert('Target user not found.');
+              return;
+            }
+
+            // Local Requester Record
+            const requesterRecord = { id: txId, type: 'request', amount: amount, payId: rawTargetPayId, targetName: recipientUser.name, date: timestamp, status: 'Pending' };
+            currentUserData.requests.push(requesterRecord);
+            currentUserData.transactions.push(requesterRecord);
+
+            // Send Incoming Notification Request to Target User
+            const targetReqList = recipientUser.requests ? (Array.isArray(recipientUser.requests) ? recipientUser.requests : Object.values(recipientUser.requests)) : [];
+            targetReqList.push({
+              id: txId,
+              isIncoming: true,
+              requesterName: currentUserData.name,
+              requesterPayId: currentUserData.payId,
+              requesterPhoneKey: getCleanPhoneKey(),
+              amount: amount,
+              date: timestamp,
+              status: 'Pending'
+            });
+
+            db.ref('users/' + targetPhoneKey).update({
+              requests: targetReqList
+            });
+
+            saveUserDataToFirebase();
+            closeActionModal();
+            alert(`Payment request of $${amount.toFixed(2)} sent to ${recipientUser.name}!`);
+          });
+        });
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('activeUserPhone');
+      localStorage.removeItem('paypulse_logged_phone');
+      location.reload();
+    }
+  </script>
+</body>
+</html>
