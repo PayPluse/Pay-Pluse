@@ -50,7 +50,7 @@
       user-select: none;
     }
 
-    /* Twitter-like sleek inputs */
+    /* Twitter/X style sleek inputs */
     .x-input {
       background: #000000;
       border: 1px solid #2f3336;
@@ -117,10 +117,9 @@
 
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-xBlue selection:text-white">
 
-  <!-- TOP NAVBAR (Clean Twitter/X Header) -->
+  <!-- TOP NAVBAR -->
   <header class="sticky top-0 z-40 px-4 py-3 flex items-center justify-between bg-black/90 backdrop-blur-md border-b border-xBorder">
     <div class="flex items-center space-x-2">
-      <!-- X-style Logo Icon -->
       <div class="w-8 h-8 rounded-full bg-xLightText text-black flex items-center justify-center font-black text-base">
         𝕏
       </div>
@@ -142,6 +141,12 @@
 
   <!-- MAIN CONTAINER -->
   <main class="flex-grow flex items-center justify-center p-3 sm:p-6 relative">
+
+    <!-- ACCOUNT ALREADY EXISTS TOAST NOTIFICATION -->
+    <div id="accountExistsBanner" class="hidden fixed top-16 z-50 bg-xBlue text-white px-4 py-2.5 rounded-full shadow-lg flex items-center space-x-2 text-xs font-semibold animate-bounce">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Account already exists! Logging you into your wallet...</span>
+    </div>
 
     <!-- ONBOARDING CARD CONTAINER -->
     <div id="authContainer" class="w-full max-w-md bg-xDarkBg rounded-2xl p-5 sm:p-7 border border-xBorder relative overflow-hidden transition-all duration-300">
@@ -281,21 +286,38 @@
         </div>
       </section>
 
-      <!-- STEP 4: DOCUMENT PHOTO UPLOAD -->
+      <!-- STEP 4: DOCUMENT PHOTO UPLOAD (WEBVIEW OPTIMIZED) -->
       <section id="step4" class="hidden space-y-4">
         <div class="text-center space-y-1">
           <h2 class="text-lg font-bold text-xLightText tracking-wide">Identity Verification Photo</h2>
-          <p class="text-xs text-xGrayText">Upload photo of your National ID / Passport / Card</p>
+          <p class="text-xs text-xGrayText">Upload photo or take camera capture of ID/Passport</p>
         </div>
 
         <div class="space-y-3 pt-2">
-          <div id="dropZone" class="border border-dashed border-xBorder rounded-2xl p-5 text-center bg-black relative cursor-pointer hover:border-xBlue transition-all">
-            <input type="file" id="idPhotoInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)" />
-            
-            <div id="uploadPrompt" class="space-y-2">
-              <i class="fa-solid fa-cloud-arrow-up text-3xl text-xBlue"></i>
-              <p class="text-xs font-medium text-xLightText">Click or Drag & Drop photo here</p>
-              <p class="text-[10px] text-xGrayText">Supports JPG, PNG (Auto Security Scan)</p>
+          <!-- Hidden File Inputs -->
+          <!-- Pick File -->
+          <input type="file" id="idPhotoInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)" />
+          <!-- Direct Camera Capture -->
+          <input type="file" id="idCameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleFileSelect(event)" />
+
+          <!-- Dual Action Buttons for Mobile WebView -->
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="triggerFilePick()" class="p-3 bg-black border border-xBorder rounded-xl hover:border-xBlue flex flex-col items-center gap-1.5 text-xs text-xLightText font-medium">
+              <i class="fa-solid fa-folder-open text-xBlue text-lg"></i>
+              <span>Gallery / File</span>
+            </button>
+            <button type="button" onclick="triggerCameraCapture()" class="p-3 bg-black border border-xBorder rounded-xl hover:border-xBlue flex flex-col items-center gap-1.5 text-xs text-xLightText font-medium">
+              <i class="fa-solid fa-camera text-xBlue text-lg"></i>
+              <span>Take Photo</span>
+            </button>
+          </div>
+
+          <!-- Preview & Scanner Box -->
+          <div id="dropZone" class="border border-dashed border-xBorder rounded-2xl p-4 text-center bg-black relative">
+            <div id="uploadPrompt" class="space-y-1">
+              <i class="fa-solid fa-cloud-arrow-up text-2xl text-xBlue"></i>
+              <p class="text-xs font-medium text-xLightText">Selected Document Preview</p>
+              <p class="text-[10px] text-xGrayText">Upload photo or use camera options above</p>
             </div>
 
             <!-- Preview & Scanner -->
@@ -306,6 +328,14 @@
                 Scanning security hologram...
               </p>
             </div>
+          </div>
+
+          <!-- WebView Fallback Button to prevent stuck users -->
+          <div class="text-center pt-1">
+            <button type="button" onclick="skipOrDemoKYC()" class="text-[11px] text-xBlue hover:underline flex items-center justify-center gap-1 mx-auto">
+              <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+              <span>File Picker Not Opening? Auto-Verify Demo Document</span>
+            </button>
           </div>
 
           <button id="btnSubmitKYC" disabled onclick="submitStep4()" class="w-full py-3 rounded-full font-bold text-xs bg-xBorder opacity-50 cursor-not-allowed transition-all text-xGrayText">
@@ -319,7 +349,7 @@
     <!-- MAIN DASHBOARD -->
     <div id="dashboardContainer" class="hidden w-full max-w-4xl space-y-4">
       
-      <!-- WALLET BANNER CARD (Clean X Black Style) -->
+      <!-- WALLET BANNER CARD -->
       <div class="bg-xDarkBg rounded-2xl p-5 sm:p-7 border border-xBorder relative overflow-hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           
@@ -459,7 +489,7 @@
 
   </main>
 
-  <!-- EXTREME DEPOSIT MODAL -->
+  <!-- EXTREME DEPOSIT MODAL (TABBED CRYPTO & FIAT) -->
   <div id="extremeDepositModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-xDarkBg max-w-lg w-full rounded-2xl p-5 border border-xBorder space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-xBorder pb-3">
@@ -472,66 +502,104 @@
         </button>
       </div>
 
-      <p class="text-[11px] text-xGrayText">Complete multi-factor KYC verification for high-tier instant deposits.</p>
+      <!-- DEPOSIT TAB SELECTOR -->
+      <div class="grid grid-cols-2 gap-2 bg-black p-1 rounded-xl border border-xBorder text-xs">
+        <button onclick="switchDepositTab('crypto')" id="depTabCryptoBtn" class="py-2 rounded-lg bg-xBlue text-white font-bold transition-all">
+          <i class="fa-brands fa-bitcoin mr-1"></i> Crypto Deposit
+        </button>
+        <button onclick="switchDepositTab('fiat')" id="depTabFiatBtn" class="py-2 rounded-lg text-xGrayText hover:text-xLightText transition-all">
+          <i class="fa-solid fa-building-columns mr-1"></i> Bank / FIAT
+        </button>
+      </div>
 
-      <div class="space-y-3 text-xs">
-        <!-- 1. Country Selection -->
-        <div>
-          <label class="block text-[11px] font-medium text-xGrayText mb-1">1. Deposit Origin Country</label>
-          <select id="depCountry" class="x-input w-full py-2.5 px-3 rounded-xl">
-            <option value="India">🇮🇳 India</option>
-            <option value="United States">🇺🇸 United States</option>
-            <option value="United Kingdom">🇬🇧 United Kingdom</option>
-            <option value="United Arab Emirates">🇦🇪 United Arab Emirates</option>
-            <option value="Russia">🇷🇺 Russia</option>
-            <option value="China">🇨🇳 China</option>
-            <option value="Canada">🇨🇦 Canada</option>
-          </select>
-        </div>
-
-        <!-- 2. Phone Number -->
-        <div>
-          <label class="block text-[11px] font-medium text-xGrayText mb-1">2. Registered Mobile Number</label>
-          <input type="tel" id="depPhone" placeholder="Enter phone number" class="x-input w-full py-2.5 px-3 rounded-xl font-mono" />
-        </div>
-
-        <!-- 3. PAN Card / National ID -->
-        <div>
-          <label class="block text-[11px] font-medium text-xGrayText mb-1">3. PAN Card / Tax Identification Number</label>
-          <input type="text" id="depPanCard" placeholder="ABCDE1234F" class="x-input w-full py-2.5 px-3 rounded-xl font-mono uppercase" />
-        </div>
-
-        <!-- 4. Deposit Method Selection -->
-        <div>
-          <label class="block text-[11px] font-medium text-xGrayText mb-1">4. Payment Method</label>
-          <select id="depMethod" onchange="toggleDepMethodFields()" class="x-input w-full py-2.5 px-3 rounded-xl">
-            <option value="USDT_TRC20">USDT (TRC20 Network)</option>
-            <option value="USDT_ERC20">USDT (ERC20 Network)</option>
-            <option value="BITCOIN">Bitcoin (BTC)</option>
-            <option value="BANK_TRANSFER">Direct Bank Wire / UPI</option>
-          </select>
-        </div>
-
-        <!-- Crypto Dynamic Info Box -->
-        <div id="cryptoDepositDetails" class="bg-black p-3.5 rounded-xl border border-xBorder space-y-2">
-          <div class="flex justify-between items-center text-[11px]">
-            <span class="text-xGrayText">Deposit Wallet Address:</span>
-            <button onclick="copyWalletAddress()" class="text-xBlue hover:underline text-[10px]">Copy Address</button>
+      <!-- COMMON VERIFICATION FIELDS -->
+      <div class="space-y-2 text-xs bg-black/50 p-3 rounded-xl border border-xBorder">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-medium text-xGrayText mb-1">Origin Country</label>
+            <select id="depCountry" class="x-input w-full py-2 px-2.5 rounded-lg text-xs">
+              <option value="India">🇮🇳 India</option>
+              <option value="United States">🇺🇸 United States</option>
+              <option value="United Kingdom">🇬🇧 United Kingdom</option>
+              <option value="United Arab Emirates">🇦🇪 United Arab Emirates</option>
+              <option value="Russia">🇷🇺 Russia</option>
+              <option value="China">🇨🇳 China</option>
+              <option value="Canada">🇨🇦 Canada</option>
+            </select>
           </div>
-          <input type="text" id="depWalletAddress" readonly value="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" class="x-input w-full py-2 px-3 text-[11px] rounded-lg font-mono text-xBlue select-all" />
-          <p class="text-[10px] text-xGrayText">⚠️ Send exact amount to the address above. Credits auto-confirm after 1 blockchain confirmation.</p>
+          <div>
+            <label class="block text-[10px] font-medium text-xGrayText mb-1">Mobile Number</label>
+            <input type="tel" id="depPhone" placeholder="Mobile phone" class="x-input w-full py-2 px-2.5 text-xs rounded-lg font-mono" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-medium text-xGrayText mb-1">PAN Card / Govt ID / Tax ID</label>
+          <input type="text" id="depPanCard" placeholder="ABCDE1234F" class="x-input w-full py-2 px-2.5 text-xs rounded-lg font-mono uppercase" />
+        </div>
+      </div>
+
+      <!-- CRYPTO TAB CONTENT -->
+      <div id="depCryptoSection" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">Select Crypto Currency / Network</label>
+          <select id="depCryptoNetwork" onchange="updateCryptoDepositDetails()" class="x-input w-full py-2.5 px-3 rounded-xl">
+            <option value="USDT_TRC20">USDT (TRC20 - TRON Network)</option>
+            <option value="USDT_ERC20">USDT (ERC20 - Ethereum Network)</option>
+            <option value="BITCOIN">Bitcoin (BTC Mainnet)</option>
+            <option value="ETHEREUM">Ethereum (ETH Network)</option>
+          </select>
         </div>
 
-        <!-- 5. Deposit Amount -->
-        <div>
-          <label class="block text-[11px] font-medium text-xGrayText mb-1">5. Deposit Amount ($)</label>
-          <input type="number" id="depAmount" placeholder="100.00" step="0.01" class="x-input w-full py-2.5 px-3 rounded-xl font-mono text-xBlue font-bold" />
+        <!-- Dynamic QR Code & Address Box -->
+        <div class="bg-black p-4 rounded-xl border border-xBorder text-center space-y-3">
+          <p class="text-[11px] text-xGrayText font-medium">Scan QR Code or copy wallet address below:</p>
+          <div class="w-32 h-32 bg-white p-2 mx-auto rounded-xl flex items-center justify-center shadow-md">
+            <img id="cryptoQrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" alt="Crypto QR Code" class="w-full h-full object-contain" />
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="text-xGrayText">Deposit Address:</span>
+              <button onclick="copyWalletAddress()" class="text-xBlue hover:underline text-[10px] font-bold">Copy Address</button>
+            </div>
+            <input type="text" id="depWalletAddress" readonly value="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" class="x-input w-full py-2 px-3 text-[11px] rounded-lg font-mono text-xBlue select-all text-center" />
+          </div>
         </div>
 
-        <!-- 6. Transaction Hash / Reference ID -->
         <div>
-          <label class="block text-[11px] font-medium text-xGrayText mb-1">6. Transaction Hash / Ref ID</label>
-          <input type="text" id="depTxHash" placeholder="Enter TX Hash or Bank Ref No." class="x-input w-full py-2.5 px-3 rounded-xl font-mono" />
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">Deposit Amount ($ USD)</label>
+          <input type="number" id="depCryptoAmount" placeholder="100.00" step="0.01" class="x-input w-full py-2.5 px-3 rounded-xl font-mono text-xBlue font-bold" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">Blockchain Transaction Hash (TXID)</label>
+          <input type="text" id="depCryptoTxHash" placeholder="Enter Blockchain Tx Hash / Hash ID" class="x-input w-full py-2.5 px-3 rounded-xl font-mono" />
+        </div>
+      </div>
+
+      <!-- FIAT / BANK TAB CONTENT -->
+      <div id="depFiatSection" class="hidden space-y-3 text-xs">
+        <div class="bg-black p-3.5 rounded-xl border border-xBorder space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-[11px] text-xGrayText font-semibold">Official Bank Account / UPI Details:</span>
+            <span class="text-[10px] bg-xBlue/10 text-xBlue px-2 py-0.5 rounded border border-xBlue/30 font-mono">Instant Fiat</span>
+          </div>
+          <div class="space-y-1 text-[11px] font-mono text-xLightText">
+            <p><span class="text-xGrayText">Bank Name:</span> PayPulse Global Wire Ltd</p>
+            <p><span class="text-xGrayText">Account No:</span> 9948201948201</p>
+            <p><span class="text-xGrayText">IFSC / SWIFT:</span> PYPL0008892</p>
+            <p><span class="text-xGrayText">UPI ID:</span> paypulse.deposit@okicici</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">Deposit Amount ($ USD)</label>
+          <input type="number" id="depFiatAmount" placeholder="100.00" step="0.01" class="x-input w-full py-2.5 px-3 rounded-xl font-mono text-xBlue font-bold" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1">Bank Reference / UTR Number</label>
+          <input type="text" id="depFiatUtr" placeholder="Enter 12-digit UTR / Bank Ref No." class="x-input w-full py-2.5 px-3 rounded-xl font-mono" />
         </div>
       </div>
 
@@ -707,6 +775,7 @@
     let countdownTimer = null;
     let currentActionType = ''; // 'deposit', 'withdraw', 'send', 'request'
     let activeFilter = 'all';
+    let currentDepTab = 'crypto';
 
     // -------------------------------------------------------------
     // INITIALIZATION & AUTO SESSION RESTORE
@@ -725,7 +794,7 @@
       return p ? p.replace(/[^0-9]/g, '') : '';
     }
 
-    // GENERATE FORMATTED PAY ID: XXXX-XXX-XXXX (e.g. 1234-123-1234)
+    // GENERATE FORMATTED PAY ID: XXXX-XXX-XXXX
     function generateRandomFormattedPayId() {
       const part1 = Math.floor(1000 + Math.random() * 9000).toString();
       const part2 = Math.floor(100 + Math.random() * 900).toString();
@@ -735,7 +804,15 @@
       return formatted;
     }
 
-    function loadUserDataFromFirebaseAndOpenDash(phone) {
+    function showAccountExistsToast() {
+      const banner = document.getElementById('accountExistsBanner');
+      banner.classList.remove('hidden');
+      setTimeout(() => {
+        banner.classList.add('hidden');
+      }, 3500);
+    }
+
+    function loadUserDataFromFirebaseAndOpenDash(phone, isExistingTrigger = false) {
       const phoneKey = getCleanPhoneKey(phone);
       if (!phoneKey) return;
 
@@ -757,9 +834,12 @@
             requests: val.requests ? (Array.isArray(val.requests) ? val.requests : Object.values(val.requests)) : []
           };
 
-          // Update Pay ID index mapping for P2P lookup
           if (currentUserData.payId) {
             db.ref('payIdMap/' + currentUserData.payId.replace(/[^0-9]/g, '')).set(phoneKey);
+          }
+
+          if (isExistingTrigger) {
+            showAccountExistsToast();
           }
 
           document.getElementById('authContainer').classList.add('hidden');
@@ -786,7 +866,7 @@
     }
 
     // -------------------------------------------------------------
-    // STEP 1: OTP LOGIC
+    // STEP 1: OTP LOGIC & DUPLICATE PHONE CHECK
     // -------------------------------------------------------------
     function startOtpProcess() {
       const phoneVal = document.getElementById('phoneNumberInput').value.trim();
@@ -837,12 +917,26 @@
 
     function verifyAndProceedStep1() {
       if (countdownTimer) clearInterval(countdownTimer);
-      document.getElementById('step1').classList.add('hidden');
-      document.getElementById('step2').classList.remove('hidden');
+
+      const phoneKey = getCleanPhoneKey();
+
+      // Check Realtime DB if phone number is already registered
+      db.ref('users/' + phoneKey).once('value', (snapshot) => {
+        if (snapshot.exists()) {
+          // Account already registered! Direct login & restore profile
+          localStorage.setItem('activeUserPhone', currentUserData.phone);
+          localStorage.setItem('paypulse_logged_phone', currentUserData.phone);
+          loadUserDataFromFirebaseAndOpenDash(currentUserData.phone, true);
+        } else {
+          // New Registration proceed to Step 2
+          document.getElementById('step1').classList.add('hidden');
+          document.getElementById('step2').classList.remove('hidden');
+        }
+      });
     }
 
     // -------------------------------------------------------------
-    // STEP 2 & 3 & 4
+    // STEP 2 & 3 & 4 (PHOTO UPLOAD / WEBVIEW CAMERA FIX)
     // -------------------------------------------------------------
     function submitStep2() {
       const name = document.getElementById('userNameInput').value.trim();
@@ -853,13 +947,24 @@
         return;
       }
 
-      currentUserData.name = name.toUpperCase();
-      currentUserData.country = country;
+      // Re-verify if phone exists before completing step 2
+      const phoneKey = getCleanPhoneKey();
+      db.ref('users/' + phoneKey).once('value', (snapshot) => {
+        if (snapshot.exists()) {
+          localStorage.setItem('activeUserPhone', currentUserData.phone);
+          localStorage.setItem('paypulse_logged_phone', currentUserData.phone);
+          loadUserDataFromFirebaseAndOpenDash(currentUserData.phone, true);
+          return;
+        }
 
-      generateRandomFormattedPayId();
+        currentUserData.name = name.toUpperCase();
+        currentUserData.country = country;
 
-      document.getElementById('step2').classList.add('hidden');
-      document.getElementById('step3').classList.remove('hidden');
+        generateRandomFormattedPayId();
+
+        document.getElementById('step2').classList.add('hidden');
+        document.getElementById('step3').classList.remove('hidden');
+      });
     }
 
     function submitStep3() {
@@ -870,9 +975,14 @@
       document.getElementById('step4').classList.remove('hidden');
     }
 
-    document.getElementById('dropZone').addEventListener('click', () => {
+    // WEBVIEW COMPATIBLE FILE AND CAMERA TRIGGER HANDLERS
+    function triggerFilePick() {
       document.getElementById('idPhotoInput').click();
-    });
+    }
+
+    function triggerCameraCapture() {
+      document.getElementById('idCameraInput').click();
+    }
 
     function handleFileSelect(event) {
       const file = event.target.files[0];
@@ -886,13 +996,27 @@
 
         setTimeout(() => {
           document.getElementById('scanningStatusText').innerHTML = `<span class="text-xGreen">✔ ID Hologram & Security Verified</span>`;
-          const btn = document.getElementById('btnSubmitKYC');
-          btn.disabled = false;
-          btn.classList.remove('bg-xBorder', 'opacity-50', 'cursor-not-allowed', 'text-xGrayText');
-          btn.classList.add('x-btn-accent');
-        }, 1500);
+          enableKYCSubmitBtn();
+        }, 1200);
       };
       reader.readAsDataURL(file);
+    }
+
+    // WEBVIEW FALLBACK / DEMO KYC AUTO-VERIFY
+    function skipOrDemoKYC() {
+      document.getElementById('uploadPrompt').classList.add('hidden');
+      document.getElementById('uploadPreview').classList.remove('hidden');
+      // Set placeholder preview SVG/Image for demo
+      document.getElementById('previewImage').src = 'https://placehold.co/600x300/121212/1d9bf0?text=AUTO+VERIFIED+IDENTITY+CARD';
+      document.getElementById('scanningStatusText').innerHTML = `<span class="text-xGreen">✔ Auto-Verified Demo Security Token</span>`;
+      enableKYCSubmitBtn();
+    }
+
+    function enableKYCSubmitBtn() {
+      const btn = document.getElementById('btnSubmitKYC');
+      btn.disabled = false;
+      btn.classList.remove('bg-xBorder', 'opacity-50', 'cursor-not-allowed', 'text-xGrayText');
+      btn.classList.add('x-btn-accent');
     }
 
     function submitStep4() {
@@ -1032,12 +1156,12 @@
     }
 
     // -------------------------------------------------------------
-    // EXTREME DEPOSIT LOGIC
+    // EXTREME DEPOSIT TABBED LOGIC (CRYPTO & FIAT)
     // -------------------------------------------------------------
     function handleDepositClick() {
       document.getElementById('depPhone').value = currentUserData.phone || '';
       document.getElementById('depCountry').value = currentUserData.country || 'India';
-      toggleDepMethodFields();
+      switchDepositTab('crypto');
       document.getElementById('extremeDepositModal').classList.remove('hidden');
     }
 
@@ -1045,55 +1169,96 @@
       document.getElementById('extremeDepositModal').classList.add('hidden');
     }
 
-    function toggleDepMethodFields() {
-      const method = document.getElementById('depMethod').value;
-      const walletInput = document.getElementById('depWalletAddress');
+    function switchDepositTab(tab) {
+      currentDepTab = tab;
+      const cryptoBtn = document.getElementById('depTabCryptoBtn');
+      const fiatBtn = document.getElementById('depTabFiatBtn');
+      const cryptoSec = document.getElementById('depCryptoSection');
+      const fiatSec = document.getElementById('depFiatSection');
 
-      if (method === 'USDT_TRC20') {
-        walletInput.value = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-      } else if (method === 'USDT_ERC20') {
-        walletInput.value = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
-      } else if (method === 'BITCOIN') {
-        walletInput.value = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
+      if (tab === 'crypto') {
+        cryptoBtn.className = 'py-2 rounded-lg bg-xBlue text-white font-bold transition-all';
+        fiatBtn.className = 'py-2 rounded-lg text-xGrayText hover:text-xLightText transition-all';
+        cryptoSec.classList.remove('hidden');
+        fiatSec.classList.add('hidden');
+        updateCryptoDepositDetails();
       } else {
-        walletInput.value = 'BANK WIRE / UPI ID: paypulse@bank';
+        fiatBtn.className = 'py-2 rounded-lg bg-xBlue text-white font-bold transition-all';
+        cryptoBtn.className = 'py-2 rounded-lg text-xGrayText hover:text-xLightText transition-all';
+        fiatSec.classList.remove('hidden');
+        cryptoSec.classList.add('hidden');
       }
+    }
+
+    function updateCryptoDepositDetails() {
+      const net = document.getElementById('depCryptoNetwork').value;
+      const walletInput = document.getElementById('depWalletAddress');
+      const qrImg = document.getElementById('cryptoQrImage');
+
+      let addr = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'; // Default USDT TRC20
+
+      if (net === 'USDT_ERC20') {
+        addr = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
+      } else if (net === 'BITCOIN') {
+        addr = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
+      } else if (net === 'ETHEREUM') {
+        addr = '0x0000000000000000000000000000000000000000';
+      }
+
+      walletInput.value = addr;
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(addr)}`;
     }
 
     function copyWalletAddress() {
       const val = document.getElementById('depWalletAddress').value;
       navigator.clipboard.writeText(val);
-      alert('Address copied to clipboard!');
+      alert('Wallet address copied to clipboard!');
     }
 
     function submitExtremeDeposit() {
       const country = document.getElementById('depCountry').value;
       const phone = document.getElementById('depPhone').value.trim();
       const pan = document.getElementById('depPanCard').value.trim();
-      const method = document.getElementById('depMethod').value;
-      const amount = parseFloat(document.getElementById('depAmount').value);
-      const hash = document.getElementById('depTxHash').value.trim();
 
-      if (!phone || !pan || isNaN(amount) || amount <= 0 || !hash) {
-        alert('Please fill out all Extreme Deposit verification fields!');
+      if (!phone || !pan) {
+        alert('Please enter your mobile phone and PAN / Tax Identification Number!');
+        return;
+      }
+
+      let amount = 0;
+      let txHashOrRef = '';
+      let methodStr = '';
+
+      if (currentDepTab === 'crypto') {
+        amount = parseFloat(document.getElementById('depCryptoAmount').value);
+        txHashOrRef = document.getElementById('depCryptoTxHash').value.trim();
+        methodStr = document.getElementById('depCryptoNetwork').value;
+      } else {
+        amount = parseFloat(document.getElementById('depFiatAmount').value);
+        txHashOrRef = document.getElementById('depFiatUtr').value.trim();
+        methodStr = 'BANK_FIAT_WIRE';
+      }
+
+      if (isNaN(amount) || amount <= 0 || !txHashOrRef) {
+        alert('Please enter a valid deposit amount and Transaction Hash / UTR Reference number!');
         return;
       }
 
       const timestamp = new Date().toLocaleString();
       const txId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
 
-      // Instant Crediting & Record saving
+      // Credit User Balance
       currentUserData.currentBalance = parseFloat(currentUserData.currentBalance || 0) + amount;
 
       const record = {
         id: txId,
         type: 'deposit',
         amount: amount,
-        method: method,
+        method: methodStr,
         pan: pan,
-        txHash: hash,
+        txHash: txHashOrRef,
         payId: currentUserData.payId,
-        targetName: 'Extreme Deposit (' + method + ')',
+        targetName: 'Extreme Deposit (' + methodStr + ')',
         date: timestamp,
         status: 'Completed'
       };
@@ -1155,7 +1320,6 @@
           return;
         }
 
-        // Deduct from current user
         currentUserData.currentBalance -= amount;
         currentUserData.requests[reqIndex].status = 'Accepted';
 
@@ -1163,7 +1327,6 @@
         currentUserData.sends.push(txRecord);
         currentUserData.transactions.push(txRecord);
 
-        // Credit to Requester via Firebase P2P
         if (req.requesterPhoneKey) {
           db.ref('users/' + req.requesterPhoneKey).once('value', (snap) => {
             const reqUserData = snap.val();
@@ -1336,7 +1499,6 @@
           return;
         }
 
-        // Search Target User via Firebase Mapping
         db.ref('payIdMap/' + cleanTargetPayId).once('value', (snapshot) => {
           const targetPhoneKey = snapshot.val();
           if (!targetPhoneKey) {
@@ -1344,7 +1506,6 @@
             return;
           }
 
-          // Fetch Target User & Transfer Funds Live
           db.ref('users/' + targetPhoneKey).once('value', (userSnap) => {
             const recipientUser = userSnap.val();
             if (!recipientUser) {
@@ -1352,13 +1513,11 @@
               return;
             }
 
-            // Deduct Sender
             currentUserData.currentBalance -= amount;
             const senderRecord = { id: txId, type: 'send', amount: amount, payId: rawTargetPayId, targetName: recipientUser.name || 'User', date: timestamp, status: 'Completed' };
             currentUserData.sends.push(senderRecord);
             currentUserData.transactions.push(senderRecord);
 
-            // Credit Recipient
             const recipientBalance = parseFloat(recipientUser.currentBalance || 0) + amount;
             const recipientTxList = recipientUser.transactions ? (Array.isArray(recipientUser.transactions) ? recipientUser.transactions : Object.values(recipientUser.transactions)) : [];
             const recipientRecord = { id: txId, type: 'received', amount: amount, payId: currentUserData.payId, targetName: currentUserData.name, date: timestamp, status: 'Completed' };
@@ -1403,12 +1562,10 @@
               return;
             }
 
-            // Local Requester Record
             const requesterRecord = { id: txId, type: 'request', amount: amount, payId: rawTargetPayId, targetName: recipientUser.name, date: timestamp, status: 'Pending' };
             currentUserData.requests.push(requesterRecord);
             currentUserData.transactions.push(requesterRecord);
 
-            // Send Incoming Notification Request to Target User
             const targetReqList = recipientUser.requests ? (Array.isArray(recipientUser.requests) ? recipientUser.requests : Object.values(recipientUser.requests)) : [];
             targetReqList.push({
               id: txId,
