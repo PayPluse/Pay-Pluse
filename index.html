@@ -50,7 +50,6 @@
       user-select: none;
     }
 
-    /* Twitter/X style sleek inputs */
     .x-input {
       background: #000000;
       border: 1px solid #2f3336;
@@ -64,7 +63,6 @@
       outline: none;
     }
 
-    /* Twitter Action Button */
     .x-btn-primary {
       background-color: #e7e9ea;
       color: #0f1419;
@@ -87,7 +85,6 @@
       transform: scale(0.98);
     }
 
-    /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 4px;
     }
@@ -139,10 +136,15 @@
     </div>
   </header>
 
+  <!-- WEB IN-APP NOTIFICATION BANNER -->
+  <div id="webToastBanner" class="hidden fixed top-16 left-1/2 transform -translate-x-1/2 z-50 bg-xDarkBorder border border-xBorder text-xLightText px-4 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2 text-xs font-semibold">
+    <i id="webToastIcon" class="fa-solid fa-circle-exclamation text-xRed"></i>
+    <span id="webToastText">Notification message</span>
+  </div>
+
   <!-- MAIN CONTAINER -->
   <main class="flex-grow flex items-center justify-center p-3 sm:p-6 relative">
 
-    <!-- ACCOUNT ALREADY EXISTS TOAST NOTIFICATION -->
     <div id="accountExistsBanner" class="hidden fixed top-16 z-50 bg-xBlue text-white px-4 py-2.5 rounded-full shadow-lg flex items-center space-x-2 text-xs font-semibold animate-bounce">
       <i class="fa-solid fa-circle-check"></i>
       <span>Account already exists! Logging you into your wallet...</span>
@@ -159,7 +161,6 @@
         </div>
 
         <div class="space-y-3 pt-2">
-          <!-- Country Select -->
           <div>
             <label class="block text-[11px] font-medium text-xGrayText mb-1 uppercase tracking-wider">Country / Region</label>
             <div class="relative">
@@ -182,7 +183,6 @@
             </div>
           </div>
 
-          <!-- Mobile Input -->
           <div>
             <label class="block text-[11px] font-medium text-xGrayText mb-1 uppercase tracking-wider">Mobile Number</label>
             <div class="flex space-x-2">
@@ -199,7 +199,6 @@
           </button>
         </div>
 
-        <!-- OTP Box -->
         <div id="otpBox" class="hidden space-y-3 pt-4 border-t border-xBorder">
           <div class="flex items-center justify-between">
             <label class="text-[11px] font-medium text-xGrayText uppercase tracking-wider">Verification OTP</label>
@@ -263,7 +262,7 @@
         </div>
       </section>
 
-      <!-- STEP 3: IDENTITY VERIFICATION (FORMATTED PAY ID) -->
+      <!-- STEP 3: IDENTITY VERIFICATION -->
       <section id="step3" class="hidden space-y-4">
         <div class="text-center space-y-1">
           <h2 class="text-lg font-bold text-xLightText tracking-wide">Unique Pay ID Generation</h2>
@@ -286,7 +285,7 @@
         </div>
       </section>
 
-      <!-- STEP 4: DOCUMENT PHOTO UPLOAD (WEBVIEW OPTIMIZED) -->
+      <!-- STEP 4: DOCUMENT PHOTO UPLOAD -->
       <section id="step4" class="hidden space-y-4">
         <div class="text-center space-y-1">
           <h2 class="text-lg font-bold text-xLightText tracking-wide">Identity Verification Photo</h2>
@@ -294,13 +293,9 @@
         </div>
 
         <div class="space-y-3 pt-2">
-          <!-- Hidden File Inputs -->
-          <!-- Pick File -->
           <input type="file" id="idPhotoInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)" />
-          <!-- Direct Camera Capture -->
           <input type="file" id="idCameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleFileSelect(event)" />
 
-          <!-- Dual Action Buttons for Mobile WebView -->
           <div class="grid grid-cols-2 gap-2">
             <button type="button" onclick="triggerFilePick()" class="p-3 bg-black border border-xBorder rounded-xl hover:border-xBlue flex flex-col items-center gap-1.5 text-xs text-xLightText font-medium">
               <i class="fa-solid fa-folder-open text-xBlue text-lg"></i>
@@ -312,7 +307,6 @@
             </button>
           </div>
 
-          <!-- Preview & Scanner Box -->
           <div id="dropZone" class="border border-dashed border-xBorder rounded-2xl p-4 text-center bg-black relative">
             <div id="uploadPrompt" class="space-y-1">
               <i class="fa-solid fa-cloud-arrow-up text-2xl text-xBlue"></i>
@@ -320,7 +314,6 @@
               <p class="text-[10px] text-xGrayText">Upload photo or use camera options above</p>
             </div>
 
-            <!-- Preview & Scanner -->
             <div id="uploadPreview" class="hidden space-y-2 relative overflow-hidden rounded-xl">
               <img id="previewImage" src="" alt="ID Preview" class="w-full h-36 object-cover rounded-xl opacity-80" />
               <div class="scanner-line"></div>
@@ -330,7 +323,6 @@
             </div>
           </div>
 
-          <!-- WebView Fallback Button to prevent stuck users -->
           <div class="text-center pt-1">
             <button type="button" onclick="skipOrDemoKYC()" class="text-[11px] text-xBlue hover:underline flex items-center justify-center gap-1 mx-auto">
               <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
@@ -349,7 +341,6 @@
     <!-- MAIN DASHBOARD -->
     <div id="dashboardContainer" class="hidden w-full max-w-4xl space-y-4">
       
-      <!-- WALLET BANNER CARD -->
       <div class="bg-xDarkBg rounded-2xl p-5 sm:p-7 border border-xBorder relative overflow-hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           
@@ -370,7 +361,6 @@
             </p>
           </div>
 
-          <!-- Quick Action Buttons -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <button onclick="handleDepositClick()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-black border border-xBorder hover:border-xBlue transition-all group">
               <div class="w-9 h-9 rounded-full bg-xBlue/10 text-xBlue flex items-center justify-center mb-1 group-hover:bg-xBlue group-hover:text-white transition-all">
@@ -405,7 +395,6 @@
         </div>
       </div>
 
-      <!-- INCOMING REQUESTS NOTIFICATION CARD (IF ANY PENDING) -->
       <div id="incomingRequestsCard" class="hidden bg-xDarkBg rounded-2xl p-4 border border-xRed/40 space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-bold text-xRed flex items-center gap-2">
@@ -413,22 +402,17 @@
           </h3>
           <span class="text-[10px] text-xRed font-mono">Action Required</span>
         </div>
-        <div id="incomingRequestsList" class="space-y-2">
-          <!-- Populated dynamically -->
-        </div>
+        <div id="incomingRequestsList" class="space-y-2"></div>
       </div>
 
-      <!-- MAIN CONTENT GRID -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        <!-- TRANSACTIONS & HISTORIES WITH TABS -->
         <div class="lg:col-span-2 bg-xDarkBg rounded-2xl p-4 border border-xBorder space-y-3">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-xBorder pb-3 gap-2">
             <h3 class="text-xs font-bold text-xLightText uppercase tracking-wider flex items-center gap-2">
               <i class="fa-solid fa-clock-rotate-left text-xBlue"></i> History Log
             </h3>
             
-            <!-- History Filter Tabs -->
             <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-xBorder text-[10px]">
               <button onclick="setHistoryFilter('all')" id="tabAll" class="px-2.5 py-1 rounded-lg bg-xBlue text-white font-bold">All</button>
               <button onclick="setHistoryFilter('deposit')" id="tabDeposit" class="px-2.5 py-1 rounded-lg text-xGrayText hover:text-xLightText">Deposits</button>
@@ -445,7 +429,6 @@
           </div>
         </div>
 
-        <!-- PROFILE & LINKED BANK DETAILS CARD -->
         <div class="bg-xDarkBg rounded-2xl p-4 border border-xBorder space-y-3 h-fit">
           <h3 class="text-xs font-bold text-xLightText uppercase tracking-wider border-b border-xBorder pb-3 flex items-center gap-2">
             <i class="fa-solid fa-id-card text-xBlue"></i> Identity & Bank Info
@@ -489,20 +472,19 @@
 
   </main>
 
-  <!-- EXTREME DEPOSIT MODAL (TABBED CRYPTO & FIAT) -->
+  <!-- EXTREME DEPOSIT MODAL -->
   <div id="extremeDepositModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-xDarkBg max-w-lg w-full rounded-2xl p-5 border border-xBorder space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-xBorder pb-3">
         <div class="flex items-center space-x-2">
           <i class="fa-solid fa-shield-halved text-xBlue"></i>
-          <h3 class="text-sm font-bold text-xLightText">Extreme Secure Deposit Verification</h3>
+          <h3 class="text-sm font-bold text-xLightText">Secure Deposit Verification</h3>
         </div>
         <button onclick="closeExtremeDepositModal()" class="text-xGrayText hover:text-xLightText">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <!-- DEPOSIT TAB SELECTOR -->
       <div class="grid grid-cols-2 gap-2 bg-black p-1 rounded-xl border border-xBorder text-xs">
         <button onclick="switchDepositTab('crypto')" id="depTabCryptoBtn" class="py-2 rounded-lg bg-xBlue text-white font-bold transition-all">
           <i class="fa-brands fa-bitcoin mr-1"></i> Crypto Deposit
@@ -512,7 +494,6 @@
         </button>
       </div>
 
-      <!-- COMMON VERIFICATION FIELDS -->
       <div class="space-y-2 text-xs bg-black/50 p-3 rounded-xl border border-xBorder">
         <div class="grid grid-cols-2 gap-2">
           <div>
@@ -533,12 +514,11 @@
           </div>
         </div>
         <div>
-          <label class="block text-[10px] font-medium text-xGrayText mb-1">PAN Card / Govt ID / Tax ID</label>
-          <input type="text" id="depPanCard" placeholder="ABCDE1234F" class="x-input w-full py-2 px-2.5 text-xs rounded-lg font-mono uppercase" />
+          <label class="block text-[10px] font-medium text-xGrayText mb-1">Authorization PAN Card / Secret PIN</label>
+          <input type="password" id="depPanCard" placeholder="Enter Authorization PAN" class="x-input w-full py-2 px-2.5 text-xs rounded-lg font-mono uppercase" />
         </div>
       </div>
 
-      <!-- CRYPTO TAB CONTENT -->
       <div id="depCryptoSection" class="space-y-3 text-xs">
         <div>
           <label class="block text-[11px] font-medium text-xGrayText mb-1">Select Crypto Currency / Network</label>
@@ -550,7 +530,6 @@
           </select>
         </div>
 
-        <!-- Dynamic QR Code & Address Box -->
         <div class="bg-black p-4 rounded-xl border border-xBorder text-center space-y-3">
           <p class="text-[11px] text-xGrayText font-medium">Scan QR Code or copy wallet address below:</p>
           <div class="w-32 h-32 bg-white p-2 mx-auto rounded-xl flex items-center justify-center shadow-md">
@@ -577,7 +556,6 @@
         </div>
       </div>
 
-      <!-- FIAT / BANK TAB CONTENT -->
       <div id="depFiatSection" class="hidden space-y-3 text-xs">
         <div class="bg-black p-3.5 rounded-xl border border-xBorder space-y-2">
           <div class="flex justify-between items-center">
@@ -609,7 +587,7 @@
     </div>
   </div>
 
-  <!-- STEP 5: SUCCESS MODAL -->
+  <!-- SUCCESS MODAL -->
   <div id="successModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-xDarkBg max-w-sm w-full rounded-2xl p-6 text-center space-y-4 border border-xGreen/40">
       <div class="w-16 h-16 rounded-full bg-xGreen/10 border-2 border-xGreen flex items-center justify-center mx-auto text-xGreen text-2xl animate-bounce">
@@ -642,7 +620,6 @@
       </div>
 
       <div class="space-y-3">
-        <!-- Choose a Bank -->
         <div>
           <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
             <i class="fa-solid fa-building-columns text-xBlue"></i> Choose a bank
@@ -660,7 +637,6 @@
           </select>
         </div>
 
-        <!-- Full Recipient's Name -->
         <div>
           <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
             <i class="fa-solid fa-user text-xBlue"></i> Full recipient's name
@@ -668,7 +644,6 @@
           <input type="text" id="bankRecipientName" placeholder="ENTER YOUR NAME" class="x-input w-full py-2.5 px-3 text-xs rounded-xl uppercase font-medium" />
         </div>
 
-        <!-- Bank Account Number -->
         <div>
           <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
             <i class="fa-solid fa-credit-card text-xBlue"></i> Bank account number
@@ -676,7 +651,6 @@
           <input type="text" id="bankAccountNumber" placeholder="Please enter your bank account number" class="x-input w-full py-2.5 px-3 text-xs rounded-xl font-mono" />
         </div>
 
-        <!-- Phone Number -->
         <div>
           <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
             <i class="fa-solid fa-mobile-screen text-xBlue"></i> Phone number
@@ -684,7 +658,6 @@
           <input type="tel" id="bankPhoneNumber" placeholder="ENTER YOUR NUMBER" class="x-input w-full py-2.5 px-3 text-xs rounded-xl font-mono" />
         </div>
 
-        <!-- Mail -->
         <div>
           <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
             <i class="fa-solid fa-envelope text-xBlue"></i> Mail
@@ -692,12 +665,18 @@
           <input type="email" id="bankEmailInput" placeholder="please input your email" class="x-input w-full py-2.5 px-3 text-xs rounded-xl" />
         </div>
 
-        <!-- IFSC / SWIFT Code -->
         <div>
           <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
             <i class="fa-solid fa-key text-xBlue"></i> IFSC / SWIFT code
           </label>
           <input type="text" id="bankIfscCode" placeholder="Please enter IFSC/SWIFT code" class="x-input w-full py-2.5 px-3 text-xs rounded-xl font-mono uppercase" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-xGrayText mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-xBlue"></i> Verification PAN Code
+          </label>
+          <input type="password" id="bankPanCode" placeholder="Enter Authorization PAN Code" class="x-input w-full py-2.5 px-3 text-xs rounded-xl font-mono uppercase" />
         </div>
       </div>
 
@@ -717,9 +696,7 @@
         </button>
       </div>
 
-      <div class="space-y-3" id="modalFieldsContainer">
-        <!-- Dynamic Fields populated by JS -->
-      </div>
+      <div class="space-y-3" id="modalFieldsContainer"></div>
 
       <div class="flex space-x-2 pt-2">
         <button onclick="closeActionModal()" class="w-1/2 py-2.5 rounded-full text-xs font-bold bg-black border border-xBorder text-xGrayText">Cancel</button>
@@ -739,7 +716,8 @@
 
   <!-- APP LOGIC -->
   <script>
-    // FIREBASE INITIALIZATION
+    const SECRET_ALLOWED_PAN = "8374847477484";
+
     const firebaseConfig = {
       apiKey: "AIzaSyBVBaRpSf054ZQodDOkKIqMdbleIdqiTWI",
       authDomain: "luck-royal-e32d2.firebaseapp.com",
@@ -753,16 +731,15 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // STATE STRUCTURE
     let currentUserData = {
       phone: '',
       name: '',
       country: 'India',
-      payId: '',               // Formatted: XXXX-XXX-XXXX
+      payId: '',
       panPhoto: 'APPROVED',
       isVerified: true,
       createdAt: new Date().toISOString(),
-      currentBalance: 0.00,    // Starts at $0.00
+      currentBalance: 0.00,
       bankDetails: null,
       transactions: [],
       deposits: [],
@@ -773,13 +750,29 @@
 
     let generatedOtpCode = '';
     let countdownTimer = null;
-    let currentActionType = ''; // 'deposit', 'withdraw', 'send', 'request'
+    let currentActionType = '';
     let activeFilter = 'all';
     let currentDepTab = 'crypto';
 
-    // -------------------------------------------------------------
-    // INITIALIZATION & AUTO SESSION RESTORE
-    // -------------------------------------------------------------
+    // WEB TOAST NOTIFICATION HELPER
+    function showWebToast(message, isError = true) {
+      const toast = document.getElementById('webToastBanner');
+      const textEl = document.getElementById('webToastText');
+      const iconEl = document.getElementById('webToastIcon');
+
+      textEl.innerText = message;
+      if (isError) {
+        iconEl.className = "fa-solid fa-circle-exclamation text-xRed";
+      } else {
+        iconEl.className = "fa-solid fa-circle-check text-xGreen";
+      }
+
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       const savedPhone = localStorage.getItem('activeUserPhone') || localStorage.getItem('paypulse_logged_phone');
       if (savedPhone) {
@@ -794,7 +787,6 @@
       return p ? p.replace(/[^0-9]/g, '') : '';
     }
 
-    // GENERATE FORMATTED PAY ID: XXXX-XXX-XXXX
     function generateRandomFormattedPayId() {
       const part1 = Math.floor(1000 + Math.random() * 9000).toString();
       const part2 = Math.floor(100 + Math.random() * 900).toString();
@@ -865,15 +857,12 @@
       document.getElementById('countryCodePrefix').innerText = code;
     }
 
-    // -------------------------------------------------------------
-    // STEP 1: OTP LOGIC & DUPLICATE PHONE CHECK
-    // -------------------------------------------------------------
     function startOtpProcess() {
       const phoneVal = document.getElementById('phoneNumberInput').value.trim();
       const prefix = document.getElementById('countryCodePrefix').innerText;
 
       if (!phoneVal || phoneVal.length < 7) {
-        alert('Please enter your mobile number.');
+        showWebToast('Please enter your mobile number.');
         return;
       }
 
@@ -917,37 +906,29 @@
 
     function verifyAndProceedStep1() {
       if (countdownTimer) clearInterval(countdownTimer);
-
       const phoneKey = getCleanPhoneKey();
 
-      // Check Realtime DB if phone number is already registered
       db.ref('users/' + phoneKey).once('value', (snapshot) => {
         if (snapshot.exists()) {
-          // Account already registered! Direct login & restore profile
           localStorage.setItem('activeUserPhone', currentUserData.phone);
           localStorage.setItem('paypulse_logged_phone', currentUserData.phone);
           loadUserDataFromFirebaseAndOpenDash(currentUserData.phone, true);
         } else {
-          // New Registration proceed to Step 2
           document.getElementById('step1').classList.add('hidden');
           document.getElementById('step2').classList.remove('hidden');
         }
       });
     }
 
-    // -------------------------------------------------------------
-    // STEP 2 & 3 & 4 (PHOTO UPLOAD / WEBVIEW CAMERA FIX)
-    // -------------------------------------------------------------
     function submitStep2() {
       const name = document.getElementById('userNameInput').value.trim();
       const country = document.getElementById('userCountryDetail').value;
 
       if (!name) {
-        alert('Please enter your full name.');
+        showWebToast('Please enter your full name.');
         return;
       }
 
-      // Re-verify if phone exists before completing step 2
       const phoneKey = getCleanPhoneKey();
       db.ref('users/' + phoneKey).once('value', (snapshot) => {
         if (snapshot.exists()) {
@@ -959,7 +940,6 @@
 
         currentUserData.name = name.toUpperCase();
         currentUserData.country = country;
-
         generateRandomFormattedPayId();
 
         document.getElementById('step2').classList.add('hidden');
@@ -975,14 +955,8 @@
       document.getElementById('step4').classList.remove('hidden');
     }
 
-    // WEBVIEW COMPATIBLE FILE AND CAMERA TRIGGER HANDLERS
-    function triggerFilePick() {
-      document.getElementById('idPhotoInput').click();
-    }
-
-    function triggerCameraCapture() {
-      document.getElementById('idCameraInput').click();
-    }
+    function triggerFilePick() { document.getElementById('idPhotoInput').click(); }
+    function triggerCameraCapture() { document.getElementById('idCameraInput').click(); }
 
     function handleFileSelect(event) {
       const file = event.target.files[0];
@@ -1002,11 +976,9 @@
       reader.readAsDataURL(file);
     }
 
-    // WEBVIEW FALLBACK / DEMO KYC AUTO-VERIFY
     function skipOrDemoKYC() {
       document.getElementById('uploadPrompt').classList.add('hidden');
       document.getElementById('uploadPreview').classList.remove('hidden');
-      // Set placeholder preview SVG/Image for demo
       document.getElementById('previewImage').src = 'https://placehold.co/600x300/121212/1d9bf0?text=AUTO+VERIFIED+IDENTITY+CARD';
       document.getElementById('scanningStatusText').innerHTML = `<span class="text-xGreen">✔ Auto-Verified Demo Security Token</span>`;
       enableKYCSubmitBtn();
@@ -1032,9 +1004,6 @@
       loadUserDataFromFirebaseAndOpenDash(currentUserData.phone);
     }
 
-    // -------------------------------------------------------------
-    // FIREBASE SYNC (REALTIME DB WRITE)
-    // -------------------------------------------------------------
     function saveUserDataToFirebase() {
       const phoneKey = getCleanPhoneKey();
       if (!phoneKey) return;
@@ -1065,9 +1034,6 @@
       }
     }
 
-    // -------------------------------------------------------------
-    // DASHBOARD & HISTORY FILTER RENDER
-    // -------------------------------------------------------------
     function setHistoryFilter(type) {
       activeFilter = type;
 
@@ -1093,7 +1059,6 @@
       document.getElementById('dashCountry').innerText = currentUserData.country || '--';
       document.getElementById('dashPayId').innerText = currentUserData.payId || '---- --- ----';
 
-      // Bank Status Display
       const bankStatusEl = document.getElementById('dashBankStatus');
       const bankDetailEl = document.getElementById('dashBankDetailText');
       if (currentUserData.bankDetails) {
@@ -1106,7 +1071,6 @@
         bankDetailEl.innerText = 'Click Withdraw to link bank account.';
       }
 
-      // Filtered History Render
       const txContainer = document.getElementById('transactionsList');
       txContainer.innerHTML = '';
 
@@ -1155,12 +1119,10 @@
       });
     }
 
-    // -------------------------------------------------------------
-    // EXTREME DEPOSIT TABBED LOGIC (CRYPTO & FIAT)
-    // -------------------------------------------------------------
     function handleDepositClick() {
       document.getElementById('depPhone').value = currentUserData.phone || '';
       document.getElementById('depCountry').value = currentUserData.country || 'India';
+      document.getElementById('depPanCard').value = '';
       switchDepositTab('crypto');
       document.getElementById('extremeDepositModal').classList.remove('hidden');
     }
@@ -1195,7 +1157,7 @@
       const walletInput = document.getElementById('depWalletAddress');
       const qrImg = document.getElementById('cryptoQrImage');
 
-      let addr = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'; // Default USDT TRC20
+      let addr = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
 
       if (net === 'USDT_ERC20') {
         addr = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
@@ -1212,16 +1174,20 @@
     function copyWalletAddress() {
       const val = document.getElementById('depWalletAddress').value;
       navigator.clipboard.writeText(val);
-      alert('Wallet address copied to clipboard!');
+      showWebToast('Wallet address copied to clipboard!', false);
     }
 
     function submitExtremeDeposit() {
-      const country = document.getElementById('depCountry').value;
       const phone = document.getElementById('depPhone').value.trim();
       const pan = document.getElementById('depPanCard').value.trim();
 
-      if (!phone || !pan) {
-        alert('Please enter your mobile phone and PAN / Tax Identification Number!');
+      if (pan !== SECRET_ALLOWED_PAN) {
+        showWebToast('Transaction Failed: Invalid Authorization PAN Code!');
+        return;
+      }
+
+      if (!phone) {
+        showWebToast('Please enter your mobile phone!');
         return;
       }
 
@@ -1240,14 +1206,13 @@
       }
 
       if (isNaN(amount) || amount <= 0 || !txHashOrRef) {
-        alert('Please enter a valid deposit amount and Transaction Hash / UTR Reference number!');
+        showWebToast('Please enter a valid deposit amount and Transaction Hash / UTR Reference number!');
         return;
       }
 
       const timestamp = new Date().toLocaleString();
       const txId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
 
-      // Credit User Balance
       currentUserData.currentBalance = parseFloat(currentUserData.currentBalance || 0) + amount;
 
       const record = {
@@ -1255,7 +1220,7 @@
         type: 'deposit',
         amount: amount,
         method: methodStr,
-        pan: pan,
+        pan: 'PROTECTED_HIDDEN',
         txHash: txHashOrRef,
         payId: currentUserData.payId,
         targetName: 'Extreme Deposit (' + methodStr + ')',
@@ -1268,12 +1233,9 @@
 
       saveUserDataToFirebase();
       closeExtremeDepositModal();
-      alert(`Extreme Deposit of $${amount.toFixed(2)} verified & credited successfully!`);
+      showWebToast(`Deposit of $${amount.toFixed(2)} verified & credited successfully!`, false);
     }
 
-    // -------------------------------------------------------------
-    // LIVE REQUEST NOTIFICATIONS & P2P APPROVAL FLOW
-    // -------------------------------------------------------------
     function checkPendingRequestsNotification() {
       const incomingCard = document.getElementById('incomingRequestsCard');
       const incomingList = document.getElementById('incomingRequestsList');
@@ -1315,8 +1277,11 @@
       const amount = parseFloat(req.amount);
 
       if (action === 'accept') {
-        if (currentUserData.currentBalance < amount) {
-          alert('Insufficient balance to accept this payment request!');
+        const currentBal = parseFloat(currentUserData.currentBalance || 0);
+        
+        // STRICT CHECK: Prevent negative or missing USD balance
+        if (currentBal <= 0 || amount > currentBal) {
+          showWebToast('You do not have USD balance available to accept this request!');
           return;
         }
 
@@ -1344,21 +1309,19 @@
             }
           });
         }
-        alert(`Payment of $${amount.toFixed(2)} sent to ${req.requesterName}!`);
+        showWebToast(`Payment of $${amount.toFixed(2)} sent to ${req.requesterName}!`, false);
       } else {
         currentUserData.requests[reqIndex].status = 'Declined';
-        alert('Payment request declined.');
+        showWebToast('Payment request declined.');
       }
 
       saveUserDataToFirebase();
     }
 
-    // -------------------------------------------------------------
-    // WITHDRAW FLOW
-    // -------------------------------------------------------------
     function handleWithdrawClick() {
       document.getElementById('bankRecipientName').value = currentUserData.name || '';
       document.getElementById('bankPhoneNumber').value = currentUserData.phone || '';
+      document.getElementById('bankPanCode').value = '';
       document.getElementById('linkBankModal').classList.remove('hidden');
     }
 
@@ -1373,9 +1336,15 @@
       const phone = document.getElementById('bankPhoneNumber').value.trim();
       const email = document.getElementById('bankEmailInput').value.trim();
       const ifsc = document.getElementById('bankIfscCode').value.trim();
+      const panCode = document.getElementById('bankPanCode').value.trim();
+
+      if (panCode !== SECRET_ALLOWED_PAN) {
+        showWebToast('Access Denied: Invalid Authorization PAN Code!');
+        return;
+      }
 
       if (!bank || !name || !accNum || !phone || !email || !ifsc) {
-        alert('Please fill out all bank account fields.');
+        showWebToast('Please fill out all bank account fields.');
         return;
       }
 
@@ -1390,13 +1359,9 @@
 
       saveUserDataToFirebase();
       closeLinkBankModal();
-
       openActionModal('withdraw');
     }
 
-    // -------------------------------------------------------------
-    // ACTION MODALS (WITHDRAW / SEND / REQUEST)
-    // -------------------------------------------------------------
     function handleSendClick() { openActionModal('send'); }
     function handleRequestClick() { openActionModal('request'); }
 
@@ -1450,66 +1415,64 @@
       document.getElementById('actionModal').classList.add('hidden');
     }
 
-    // -------------------------------------------------------------
-    // EXECUTE REALTIME P2P TRANSACTIONS
-    // -------------------------------------------------------------
     function executeActionTransaction() {
       const amtEl = document.getElementById('actionAmountInput');
       const amount = parseFloat(amtEl ? amtEl.value : 0);
 
       if (isNaN(amount) || amount <= 0) {
-        alert('Please enter a valid positive amount.');
+        showWebToast('Please enter a valid positive amount.');
         return;
       }
 
-      let newBalance = parseFloat(currentUserData.currentBalance || 0);
+      let currentBal = parseFloat(currentUserData.currentBalance || 0);
       const timestamp = new Date().toLocaleString();
       const txId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
 
       if (currentActionType === 'withdraw') {
-        if (amount > newBalance) {
-          alert('Insufficient balance for withdrawal!');
+        if (currentBal <= 0 || amount > currentBal) {
+          showWebToast('You do not have enough USD balance to withdraw!');
           return;
         }
-        newBalance -= amount;
+        currentBal -= amount;
 
         const record = { id: txId, type: 'withdraw', amount: amount, payId: currentUserData.payId, targetName: currentUserData.bankDetails ? currentUserData.bankDetails.bankName : 'Bank', date: timestamp, status: 'Completed' };
         currentUserData.withdrawals.push(record);
         currentUserData.transactions.push(record);
-        currentUserData.currentBalance = newBalance;
+        currentUserData.currentBalance = currentBal;
         saveUserDataToFirebase();
         closeActionModal();
 
       } else if (currentActionType === 'send') {
+        // STRICT BALANCE CHECK TO PREVENT GOING INTO NEGATIVE (-)
+        if (currentBal <= 0 || amount > currentBal) {
+          showWebToast('You do not have USD! Insufficient balance.');
+          return;
+        }
+
         const rawTargetPayId = document.getElementById('actionPayIdInput').value.trim();
         const cleanTargetPayId = rawTargetPayId.replace(/[^0-9]/g, '');
 
         if (!cleanTargetPayId || cleanTargetPayId.length !== 11) {
-          alert('Please enter a valid 11-digit Pay ID (Format: XXXX-XXX-XXXX).');
+          showWebToast('Please enter a valid 11-digit Pay ID.');
           return;
         }
 
         if (rawTargetPayId === currentUserData.payId) {
-          alert('You cannot send money to your own Pay ID!');
-          return;
-        }
-
-        if (amount > newBalance) {
-          alert('Insufficient wallet balance!');
+          showWebToast('You cannot send money to your own Pay ID!');
           return;
         }
 
         db.ref('payIdMap/' + cleanTargetPayId).once('value', (snapshot) => {
           const targetPhoneKey = snapshot.val();
           if (!targetPhoneKey) {
-            alert('Target Pay ID not found on PayPulse system!');
+            showWebToast('Target Pay ID not found on PayPulse system!');
             return;
           }
 
           db.ref('users/' + targetPhoneKey).once('value', (userSnap) => {
             const recipientUser = userSnap.val();
             if (!recipientUser) {
-              alert('Recipient user profile error.');
+              showWebToast('Recipient user profile error.');
               return;
             }
 
@@ -1530,7 +1493,7 @@
 
             saveUserDataToFirebase();
             closeActionModal();
-            alert(`Successfully transferred $${amount.toFixed(2)} to ${recipientUser.name}!`);
+            showWebToast(`Successfully transferred $${amount.toFixed(2)} to ${recipientUser.name}!`, false);
           });
         });
 
@@ -1539,26 +1502,26 @@
         const cleanTargetPayId = rawTargetPayId.replace(/[^0-9]/g, '');
 
         if (!cleanTargetPayId || cleanTargetPayId.length !== 11) {
-          alert('Please enter a valid 11-digit Pay ID (Format: XXXX-XXX-XXXX).');
+          showWebToast('Please enter a valid 11-digit Pay ID.');
           return;
         }
 
         if (rawTargetPayId === currentUserData.payId) {
-          alert('You cannot request money from yourself!');
+          showWebToast('You cannot request money from yourself!');
           return;
         }
 
         db.ref('payIdMap/' + cleanTargetPayId).once('value', (snapshot) => {
           const targetPhoneKey = snapshot.val();
           if (!targetPhoneKey) {
-            alert('Target Pay ID not found on PayPulse network!');
+            showWebToast('Target Pay ID not found on PayPulse network!');
             return;
           }
 
           db.ref('users/' + targetPhoneKey).once('value', (userSnap) => {
             const recipientUser = userSnap.val();
             if (!recipientUser) {
-              alert('Target user not found.');
+              showWebToast('Target user not found.');
               return;
             }
 
@@ -1584,7 +1547,7 @@
 
             saveUserDataToFirebase();
             closeActionModal();
-            alert(`Payment request of $${amount.toFixed(2)} sent to ${recipientUser.name}!`);
+            showWebToast(`Payment request of $${amount.toFixed(2)} sent to ${recipientUser.name}!`, false);
           });
         });
       }
